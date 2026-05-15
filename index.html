@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> JustAstronomy — Amateur Astronomy from South India</title>
+  <meta name="description" content="Observation logs, deep sky objects, meteor showers and beginner guides from an amateur astronomer in South India.">
+
+  <!-- Google Fonts: Cormorant Garamond for headings, DM Sans for body -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    /* =====================
+       DESIGN SYSTEM
+       Change these variables to retheme the whole site at once.
+    ===================== */
+    :root {
+      --bg:         #080c16;   /* deep space background */
+      --surface:    #0e1628;   /* card backgrounds */
+      --surface-2:  #141e35;   /* darker card areas */
+      --accent:     #c9933a;   /* warm amber — like a red-light torch */
+      --text:       #e8e4d9;   /* warm off-white */
+      --text-muted: #8a93a8;   /* secondary text */
+      --border:     rgba(255, 255, 255, 0.07);
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-body:    'DM Sans', sans-serif;
+    }
+
+    /* =====================
+       RESET & BASE
+    ===================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.7;
+      min-height: 100vh;
+      /* CSS-only star field — scattered dots via radial gradients */
+      background-image:
+        radial-gradient(1px 1px at 15% 22%, rgba(255,255,255,0.65) 0%, transparent 100%),
+        radial-gradient(1px 1px at 72%  8%, rgba(255,255,255,0.5)  0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 88% 35%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 44% 15%, rgba(255,255,255,0.7)  0%, transparent 100%),
+        radial-gradient(1px 1px at  6% 60%, rgba(255,255,255,0.4)  0%, transparent 100%),
+        radial-gradient(1px 1px at 93% 72%, rgba(255,255,255,0.5)  0%, transparent 100%),
+        radial-gradient(1px 1px at 28% 80%, rgba(255,255,255,0.35) 0%, transparent 100%),
+        radial-gradient(1px 1px at 55% 90%, rgba(255,255,255,0.4)  0%, transparent 100%),
+        radial-gradient(1px 1px at 78% 55%, rgba(255,255,255,0.6)  0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 33% 44%, rgba(255,255,255,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 62% 38%, rgba(255,255,255,0.5)  0%, transparent 100%),
+        radial-gradient(1px 1px at 19% 92%, rgba(255,255,255,0.4)  0%, transparent 100%);
+      background-attachment: fixed;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    img { max-width: 100%; display: block; }
+
+    /* =====================
+       LAYOUT
+    ===================== */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* =====================
+       NAVIGATION
+    ===================== */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(8, 12, 22, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 24px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* Change "JustAstronomy" to your site name in the HTML below */
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 22px;
+      color: var(--text);
+      letter-spacing: 0.02em;
+    }
+    .nav-logo span { color: var(--accent); }
+
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--accent); text-decoration: none; }
+
+    /* =====================
+       HERO
+    ===================== */
+    .hero {
+      padding: 100px 24px 80px;
+      max-width: 900px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* Glowing orb in the top-right corner — suggests a planet or moon */
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      right: -40px;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(201,147,58,0.11) 0%, transparent 68%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .hero-eyebrow {
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(48px, 8vw, 82px);
+      font-weight: 600;
+      line-height: 1.06;
+      letter-spacing: -0.01em;
+      margin-bottom: 28px;
+      max-width: 740px;
+    }
+
+    /* The italic word in the heading — styled in accent colour */
+    .hero h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .hero-desc {
+      font-size: 18px;
+      color: var(--text-muted);
+      max-width: 520px;
+      line-height: 1.8;
+      margin-bottom: 48px;
+    }
+
+    /* Three stat counters — update the numbers as you grow */
+    .hero-stats {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .hero-stat strong {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .hero-stat small {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* =====================
+       SECTION COMMON
+    ===================== */
+    section { padding: 72px 0; }
+
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 600;
+      line-height: 1.12;
+      margin-bottom: 40px;
+    }
+
+    /* =====================
+       LATEST LOG CARD
+       Replace the placeholder text with your first real session.
+    ===================== */
+    .log-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 36px;
+      display: grid;
+      grid-template-columns: 1fr 180px;
+      gap: 32px;
+      align-items: start;
+      transition: border-color 0.25s;
+    }
+    .log-card:hover { border-color: rgba(201,147,58,0.5); }
+
+    .log-date {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .log-title {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 14px;
+      line-height: 1.2;
+    }
+
+    .log-body {
+      color: var(--text-muted);
+      font-size: 15px;
+      line-height: 1.75;
+    }
+
+    .log-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 22px;
+    }
+
+    .tag {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 10px;
+    }
+
+    /* Right-side conditions panel inside the log card */
+    .log-conditions {
+      background: var(--surface-2);
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .condition-item { display: flex; flex-direction: column; gap: 2px; }
+
+    .condition-label {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .condition-value {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    /* =====================
+       TOPIC CARDS (3-up grid)
+    ===================== */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .topic-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px 24px;
+      transition: border-color 0.2s, transform 0.2s, background 0.2s;
+    }
+    .topic-card:hover {
+      border-color: rgba(201,147,58,0.35);
+      background: var(--surface-2);
+      transform: translateY(-3px);
+      text-decoration: none;
+    }
+
+    .card-icon {
+      font-size: 30px;
+      margin-bottom: 16px;
+      display: block;
+      line-height: 1;
+    }
+
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .card-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    /* =====================
+       BEGINNER STRIP
+    ===================== */
+    .beginner-strip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 12px 12px 0;
+      padding: 32px 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+    }
+
+    .beginner-strip h3 {
+      font-family: var(--font-display);
+      font-size: 26px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .beginner-strip p {
+      color: var(--text-muted);
+      font-size: 15px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 13px 28px;
+      background: var(--accent);
+      color: #080c16;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 14px;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+      text-decoration: none;
+    }
+    .btn:hover { opacity: 0.82; text-decoration: none; }
+
+    /* =====================
+       FOOTER
+    ===================== */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+      margin-top: 40px;
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .footer-brand {
+      font-family: var(--font-display);
+      font-size: 18px;
+      color: var(--text-muted);
+    }
+    .footer-brand span { color: var(--accent); }
+
+    .footer-right {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* =====================
+       RESPONSIVE — mobile
+    ===================== */
+    @media (max-width: 640px) {
+      .nav-links       { display: none; }
+      .cards-grid      { grid-template-columns: 1fr; }
+      .log-card        { grid-template-columns: 1fr; }
+      .beginner-strip  { flex-direction: column; align-items: flex-start; }
+      .hero::before    { display: none; }
+      .footer-inner    { flex-direction: column; gap: 12px; text-align: center; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- =====================
+       NAVIGATION
+       Add or remove links to match your pages.
+  ===================== -->
+  <nav>
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">Star<span>ward</span></a>
+      <ul class="nav-links">
+        <li><a href="log.html">Log</a></li>
+        <li><a href="dso.html">Deep Sky</a></li>
+        <li><a href="meteors.html">Meteors</a></li>
+        <li><a href="equipment.html">Equipment</a></li>
+        <li><a href="beginners.html">Beginners</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- =====================
+       HERO
+       Edit the tagline, description and counters below.
+       The counters are plain text — update them manually as you observe more.
+  ===================== -->
+  <header class="hero">
+    <p class="hero-eyebrow">Amateur Astronomy · South India</p>
+
+    <h1>Looking up at<br>the <em>night sky</em></h1>
+
+    <p class="hero-desc">
+      A personal record of nights spent under the stars — observation logs,
+      deep sky objects, meteor showers, equipment buying advice, darksky locator and a bit of handholding for fellow beginners.
+    </p>
+
+    <div class="hero-stats">
+      <!-- Update these numbers after each session -->
+      <div class="hero-stat">
+        <strong>0</strong>
+        <small>Sessions logged</small>
+      </div>
+      <div class="hero-stat">
+        <strong>0</strong>
+        <small>DSOs observed</small>
+      </div>
+      <div class="hero-stat">
+        <strong>3</strong>
+        <small>Showers tracked</small>
+      </div>
+    </div>
+  </header>
+
+  <!-- =====================
+       LATEST LOG ENTRY
+       Replace the placeholder with details from your first real observing session.
+       - log-date: the night you observed (e.g. "14 May 2026")
+       - log-title: a short title (e.g. "First look at M42, the Orion Nebula")
+       - log-body: 2–3 sentences about what you saw
+       - condition-value fields: seeing (1–5), transparency (1–5), Bortle (1–9)
+  ===================== -->
+  <section>
+    <div class="container">
+      <p class="section-label">Latest entry</p>
+      <h2 class="section-title">From the observation log</h2>
+
+      <a href="log.html" style="color: inherit; display: block;">
+        <article class="log-card">
+
+          <div>
+            <p class="log-date"><!-- e.g.  14 May 2026 --> Coming soon</p>
+            <h3 class="log-title">First session entry will appear here</h3>
+            <p class="log-body">
+              After your next observing session, jot down what you saw, where you were,
+              and how the sky looked. That becomes your first entry — and this card will
+              link to the full write-up on the Log page.
+            </p>
+            <div class="log-tags">
+              <span class="tag">Visual</span>
+              <span class="tag">Deep sky</span>
+              <span class="tag">Bengaluru</span>
+            </div>
+          </div>
+
+          <!-- Sky conditions panel — fill in after each session -->
+          <aside class="log-conditions">
+            <div class="condition-item">
+              <span class="condition-label">Seeing</span>
+              <span class="condition-value">— / 5</span>
+            </div>
+            <div class="condition-item">
+              <span class="condition-label">Transparency</span>
+              <span class="condition-value">— / 5</span>
+            </div>
+            <div class="condition-item">
+              <span class="condition-label">Bortle</span>
+              <span class="condition-value">—</span>
+            </div>
+            <div class="condition-item">
+              <span class="condition-label">Duration</span>
+              <span class="condition-value">— hrs</span>
+            </div>
+          </aside>
+
+        </article>
+      </a>
+    </div>
+  </section>
+
+  <!-- =====================
+       WHAT I OBSERVE — 3 topic cards
+       Each card links to a dedicated page.
+  ===================== -->
+  <section>
+    <div class="container">
+      <p class="section-label">What I observe</p>
+      <h2 class="section-title">Three things I track</h2>
+
+      <div class="cards-grid">
+
+        <a href="log.html" class="topic-card" style="color: inherit;">
+          <span class="card-icon">🔭</span>
+          <h3 class="card-title">Visual observing</h3>
+          <p class="card-desc">
+            Eyepiece sessions under dark skies — what I saw,
+            how I found it, and what surprised me.
+          </p>
+        </a>
+
+        <a href="dso.html" class="topic-card" style="color: inherit;">
+          <span class="card-icon">🌌</span>
+          <h3 class="card-title">Deep sky objects</h3>
+          <p class="card-desc">
+            Nebulae, galaxies and star clusters I've personally
+            observed, with notes on difficulty and visibility.
+          </p>
+        </a>
+
+        <a href="meteors.html" class="topic-card" style="color: inherit;">
+          <span class="card-icon">☄️</span>
+          <h3 class="card-title">Meteor showers</h3>
+          <p class="card-desc">
+            A yearly calendar of major showers with peak dates,
+            radiant positions and personal session notes.
+          </p>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================
+       BEGINNER'S CORNER TEASER
+  ===================== -->
+  <section>
+    <div class="container">
+      <div class="beginner-strip">
+        <div>
+          <h3>New to astronomy?</h3>
+          <p>Short, plain-language guides written for complete beginners — no telescope needed to start.</p>
+        </div>
+        <a href="beginners.html" class="btn">Start here →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================
+       FOOTER
+  ===================== -->
+  <footer>
+    <div class="footer-inner">
+      <span class="footer-brand">Star<span>ward</span></span>
+      <span class="footer-right">Bengaluru, India &nbsp;·&nbsp; Clear skies 🌠</span>
+    </div>
+  </footer>
+
+</body>
+</html>
