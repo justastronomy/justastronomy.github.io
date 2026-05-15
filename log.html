@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Observation Log — JustAstronomy</title>
+  <meta name="description" content="Personal observation log — sessions, objects observed, sky conditions and notes.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg:         #080c16;
+      --surface:    #0e1628;
+      --surface-2:  #141e35;
+      --accent:     #c9933a;
+      --text:       #e8e4d9;
+      --text-muted: #8a93a8;
+      --border:     rgba(255, 255, 255, 0.07);
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-body:    'DM Sans', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.7;
+      min-height: 100vh;
+      background-image:
+        radial-gradient(1px 1px at 15% 22%, rgba(255,255,255,0.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 72%  8%, rgba(255,255,255,0.5) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 88% 35%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 44% 15%, rgba(255,255,255,0.7) 0%, transparent 100%),
+        radial-gradient(1px 1px at  6% 60%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 93% 72%, rgba(255,255,255,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 28% 80%, rgba(255,255,255,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 62% 38%, rgba(255,255,255,0.5) 0%, transparent 100%);
+      background-attachment: fixed;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(8, 12, 22, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 24px; max-width: 900px; margin: 0 auto;
+    }
+    .nav-logo { font-family: var(--font-display); font-size: 22px; color: var(--text); }
+    .nav-logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a {
+      color: var(--text-muted); font-size: 13px; font-weight: 500;
+      letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.2s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--accent); text-decoration: none; }
+
+    /* PAGE HEADER */
+    .page-header {
+      padding: 72px 24px 48px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .page-eyebrow {
+      font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--accent); font-weight: 500; margin-bottom: 12px;
+    }
+    .page-header h1 {
+      font-family: var(--font-display);
+      font-size: clamp(36px, 6vw, 60px);
+      font-weight: 600; line-height: 1.08; margin-bottom: 16px;
+    }
+    .page-header p {
+      color: var(--text-muted); font-size: 16px; max-width: 500px; line-height: 1.75;
+    }
+
+    /* HOW TO ADD NEW ENTRIES — helper box, remove once comfortable */
+    .helper-box {
+      background: rgba(201, 147, 58, 0.07);
+      border: 1px dashed rgba(201, 147, 58, 0.3);
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-bottom: 48px;
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+    .helper-box strong { color: var(--accent); }
+
+    /* SESSION BLOCK */
+    .session {
+      margin-bottom: 64px;
+    }
+
+    /* Session header bar */
+    .session-header {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px 12px 0 0;
+      border-bottom: none;
+      padding: 28px 32px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .session-date {
+      font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 6px; font-weight: 500;
+    }
+
+    .session-title {
+      font-family: var(--font-display);
+      font-size: 28px; font-weight: 600; margin-bottom: 10px;
+    }
+
+    .session-meta {
+      display: flex; flex-wrap: wrap; gap: 20px; margin-top: 4px;
+    }
+
+    .meta-item { display: flex; flex-direction: column; gap: 2px; }
+
+    .meta-label {
+      font-size: 10px; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--text-muted);
+    }
+
+    .meta-value { font-size: 14px; color: var(--text); font-weight: 500; }
+
+    /* Bortle badge */
+    .bortle-badge {
+      background: var(--surface-2);
+      border-radius: 8px; padding: 16px 20px;
+      text-align: center; min-width: 90px;
+    }
+
+    .bortle-badge .num {
+      font-family: var(--font-display);
+      font-size: 40px; font-weight: 600; color: var(--accent);
+      line-height: 1; display: block;
+    }
+
+    .bortle-badge .lbl {
+      font-size: 9px; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--text-muted);
+    }
+
+    /* Observation entries */
+    .observations {
+      border: 1px solid var(--border);
+      border-radius: 0 0 12px 12px;
+      overflow: hidden;
+    }
+
+    /* =====================
+       OBSERVATION ENTRY
+       To add a new object: copy one <article class="obs-entry"> block and paste it.
+       Fill in: obs-object, obs-time, obs-type tag, and obs-notes text.
+    ===================== */
+    .obs-entry {
+      padding: 28px 32px;
+      border-bottom: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 24px;
+      transition: background 0.2s;
+    }
+    .obs-entry:last-child { border-bottom: none; }
+    .obs-entry:hover { background: var(--surface); }
+
+    .obs-left { display: flex; flex-direction: column; gap: 8px; }
+
+    .obs-object {
+      font-family: var(--font-display);
+      font-size: 20px; font-weight: 600; line-height: 1.2;
+    }
+
+    .obs-time {
+      font-size: 12px; color: var(--text-muted); letter-spacing: 0.04em;
+    }
+
+    .obs-type {
+      display: inline-block;
+      font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-muted); border: 1px solid var(--border);
+      border-radius: 4px; padding: 3px 9px; width: fit-content;
+    }
+
+    .obs-notes {
+      font-size: 15px; color: var(--text-muted); line-height: 1.8;
+      padding-top: 2px;
+    }
+
+    /* ADD NEW SESSION prompt at the bottom */
+    .add-prompt {
+      background: var(--surface);
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.7;
+      margin-bottom: 64px;
+    }
+    .add-prompt strong { color: var(--text); display: block; font-size: 16px; margin-bottom: 6px; }
+
+    /* FOOTER */
+    footer { border-top: 1px solid var(--border); padding: 40px 0; }
+    .footer-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      max-width: 900px; margin: 0 auto; padding: 0 24px;
+    }
+    .footer-brand { font-family: var(--font-display); font-size: 18px; color: var(--text-muted); }
+    .footer-brand span { color: var(--accent); }
+    .footer-right { font-size: 13px; color: var(--text-muted); }
+
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .obs-entry { grid-template-columns: 1fr; }
+      .session-header { grid-template-columns: 1fr; }
+      .footer-inner { flex-direction: column; gap: 12px; text-align: center; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">Just<span>Astronomy</span></a>
+      <ul class="nav-links">
+        <li><a href="log.html" class="active">Log</a></li>
+        <li><a href="dso.html">Deep Sky</a></li>
+        <li><a href="meteors.html">Meteors</a></li>
+        <li><a href="equipment.html">Equipment</a></li>
+        <li><a href="beginners.html">Beginners</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="page-header">
+    <p class="page-eyebrow">Personal record</p>
+    <h1>Observation Log</h1>
+    <p>Every session under the stars, in order. Sky conditions, objects observed, and honest notes from the eyepiece.</p>
+  </div>
+
+  <section>
+    <div class="container">
+
+      <!-- =====================
+           HOW TO ADD A NEW SESSION -->
+           <!-- Delete this box once you're comfortable editing the file. -->
+      <!-- ===================== -->
+      <!-- <div class="helper-box"> -->
+        <!-- <strong>How to add a new session:</strong> -->
+        <!-- Copy the entire &lt;!-- SESSION --&gt; block below, paste it above the existing one -->
+        <!-- (newest first), and fill in your date, location, equipment, Bortle number, -->
+        <!-- and individual object entries. Each object is one &lt;article class="obs-entry"&gt; block. -->
+      <!-- </div> -->
+
+      <!-- =====================
+           SESSION — Jan 2026, Talacauvery
+           To add a new session: copy this whole block, paste above this one, edit the details.
+      ===================== -->
+      <div class="session">
+
+        <div class="session-header">
+          <div>
+            <p class="session-date">Jan 16 – 20, 2026</p>
+            <h2 class="session-title">BAS Star party, Talacauvery, Coorg</h2>
+            <div class="session-meta">
+              <div class="meta-item">
+                <span class="meta-label">Location</span>
+                <span class="meta-value">Talacauvery, Coorg, Karnataka</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Equipment</span>
+                <span class="meta-value">12″ f/5 Dob · 25 mm, 17 mm, 10 mm · 2× Barlow</span>
+              </div>
+            </div>
+          </div>
+          <div class="bortle-badge">
+            <span class="num">3</span>
+            <span class="lbl">Bortle</span>
+          </div>
+        </div>
+
+        <div class="observations">
+
+          <!-- =====================
+               OBSERVATION ENTRY — Io
+               Copy this block to add another object to this session.
+          ===================== -->
+          <article class="obs-entry">
+            <div class="obs-left">
+              <h3 class="obs-object">M31, M32 and M110</h3>
+              <span class="obs-time">Jan 17 · 7:45 pm</span>
+              <span class="obs-type">Galaxy group</span>
+            </div>
+            <p class="obs-notes">
+              First object of the evening. The Andromeda Galaxy was looking like its usual
+              cotton-candy self — beautiful but not much internal structure. Probably bad
+              seeing early in the session, or not fully dark-adapted yet. M110 was visible.
+              M32 was not detected at 60×.
+            </p>
+          </article>
+
+          <article class="obs-entry">
+            <div class="obs-left">
+              <h3 class="obs-object">M33</h3>
+              <span class="obs-time">Jan 17 · 8:00 pm</span>
+              <span class="obs-type">Galaxy</span>
+            </div>
+            <p class="obs-notes">
+              Sky conditions improved later and M33 (Triangulum Galaxy) actually showed structure.
+              Tried it in December too, but this view was far better. One of the group — someone
+              younger with sharper eyes — noticed mottling in the spiral arms. Low surface
+              brightness object that rewards a truly dark sky.
+            </p>
+          </article>
+          <!-- ADD HERE ALSO -->
+
+          <article class="obs-entry">
+            <div class="obs-left">
+              <h3 class="obs-object">Saturn</h3>
+              <span class="obs-time">Jan 17 · 8:10 pm</span>
+              <span class="obs-type">Planet</span>
+            </div>
+            <p class="obs-notes">
+              A quick look at the Queen of the planets, Saturn. Rings edge on. No Casinni division detected. 
+              Titan and Rhea seen. Bunch of people saw it too. Bumped up mag to 150x
+            </p>
+          </article>
+
+          <article class="obs-entry">
+            <div class="obs-left">
+              <h3 class="obs-object">NGC 869</h3>
+              <span class="obs-time">Jan 17 · 8:30 pm</span>
+              <span class="obs-type">Double cluster</span>
+            </div>
+            <p class="obs-notes">
+             Double cluster in Perseus. Tack sharp. Spent too much time in this region. Tried Heart and Soul nebula, 
+             nothing detected. Need filters, I guess. My AP gear is shooting the same right now. M103, NGC659, 
+             C10 (LawnMover cluster) in Cassiopeia. Bunch of other OCs. The problem with OCs is, you've seen one, 
+             you've seen 'em all. Wanted to do Auriga, before dinner @ 9 pm, but nope
+            </p>
+          </article>
+
+           <!-- END HERE -->
+
+          <article class="obs-entry">
+            <div class="obs-left">
+              <h3 class="obs-object">Io emerging</h3>
+              <span class="obs-time">Jan 17 · 9:45 pm</span>
+              <span class="obs-type">Planetary moon</span>
+            </div>
+            <p class="obs-notes">
+              Knew that Io was being eclipsed by Jupiter and would re-emerge at around 9:50 pm.
+              Started watching Jupiter at 9:40 pm at 60×. Sure enough, just after 9:45 pm, Io
+              appeared at the edge of the southern equatorial belt — a small dot out of nowhere,
+              like an apparition in the inky black background. Switched quickly to the 10 mm EP.
+              Within minutes the moon brightened up. First time I saw this. Pretty cool.
+            </p>
+          </article>
+
+          <!-- MORE EDITS START -->
+          <article class="obs-entry">
+            <div class="obs-left">
+              <h3 class="obs-object">M1, Crab Nebula</h3>
+              <span class="obs-time">Jan 17 · 10:00 pm</span>
+              <span class="obs-type">Supernova remnant</span>
+            </div>
+            <p class="obs-notes">
+             M1 was featureless. Somebody who had seen M1 on Stellarium was disappointed, no colors
+            </p>
+          </article>
+
+          <article class="obs-entry">
+            <div class="obs-left">
+              <h3 class="obs-object">M45, Pleiades</h3>
+              <span class="obs-time">Jan 17 · 10:00 pm</span>
+              <span class="obs-type">Asterism</span>
+            </div>
+            <p class="obs-notes">
+             M45 looked nice in the binocs, Merope nebula not detected. Seeing? Equipment?
+            </p>
+          </article>
+
+          <article class="obs-entry">
+            <div class="obs-left">
+              <h3 class="obs-object">Uranus</h3>
+              <span class="obs-time">Jan 17 · 10:00 pm</span>
+              <span class="obs-type">Planet</span>
+            </div>
+            <p class="obs-notes">
+             Uranus was but a light blue dot. At 150x slightly better, still nothing to write home about. 
+             Pushed it to 300x, no good. 
+            </p>
+          </article>
+
+          <article class="obs-entry">
+            <div class="obs-left">
+              <h3 class="obs-object">M42</h3>
+              <span class="obs-time">Jan 17 · 10:20 pm</span>
+              <span class="obs-type">Reflection Nebula</span>
+            </div>
+            <p class="obs-notes">
+             The 'Hello World' of the astronomy world. A whole bunch of people lined up to see this. With the UHC filter, 
+             it looked pretty good. Counted 5 stars in the trapezium. Checked if Betelgeuse was still there. Affirmative. 
+             Still not gone Supernova 
+            </p>
+          </article>
+          
+          <article class="obs-entry">
+            <div class="obs-left">
+              <h3 class="obs-object">Flame Nebula</h3>
+              <span class="obs-time">Jan 17 · 10:30 pm</span>
+              <span class="obs-type">Reflection Nebula</span>
+            </div>
+            <p class="obs-notes">
+             Keeping Alnitak just out of the FOV, trying to observe Flame was a challenge. But finally made it. 
+             With Alnitak in the center, M78 is at about 4 O clock. The technique is to move away from Alnitak, 
+             towards M78, put M78 all the way at 10 O clock position and retrace the path. Careful not to bring 
+             back Alnitak in view, you will lose your dark adaptation 
+            </p>
+          </article>          
+
+           <!-- MORE EDITS END -->
+          <article class="obs-entry">
+            <div class="obs-left">
+              <h3 class="obs-object">NGC 1999</h3>
+              <span class="obs-time">Jan 17 · 11:00 pm</span>
+              <span class="obs-type">Reflection nebula</span>
+            </div>
+            <p class="obs-notes">
+              Also called the 13th Pearl Nebula. A buddy suggested it — the two of us spent 30–40
+              minutes trying to locate it, hopping between scopes. It sits in Orion, between M42
+              and Saiph, a little less than midway. We could barely detect it; no amount of averted
+              vision or tapping helped. Saw some nebulosity in the region but not the famous
+              keyhole shape. Apparently the dark keyhole is an actual empty hole in space, visible
+              only because of the surrounding reflection nebula.
+            </p>
+          </article>
+
+          <article class="obs-entry">
+            <div class="obs-left">
+              <h3 class="obs-object">Castor, double star</h3>
+              <span class="obs-time">Jan 17 · 11:30 pm</span>
+              <span class="obs-type">Double star</span>
+            </div>
+            <p class="obs-notes">
+             Somebody wanted to see Jupiter, but before that showed them the Castor double star system.Easily split.
+            Next was Jupiter, its bands in full glory
+            </p>
+          </article>
+
+          <!-- ADDING HERE -->
+          <article class="obs-entry">
+            <div class="obs-left">
+              <h3 class="obs-object">M44, Beehive cluster</h3>
+              <span class="obs-time">Jan 18 · 12:00 am</span>
+              <span class="obs-type">Open cluster</span>
+            </div>
+            <p class="obs-notes">
+             Beehive in Cancer. Hadnt seen it in a long time. Saw it in the binocs too. Nearby was Leo, but still under 
+             the influence of LP from the East.
+            </p>
+          </article>
+
+          <article class="obs-entry">
+            <div class="obs-left">
+              <h3 class="obs-object">M46, Open cluster</h3>
+              <span class="obs-time">Jan 18 · 12:00 am</span>
+              <span class="obs-type">Open cluster with a PN in it</span>
+            </div>
+            <p class="obs-notes">
+             The PN in M46 was nice, a tiny blob, but nice at 150x. Reminded me of Ghost of Jupiter
+            </p>
+          </article>
+
+          <article class="obs-entry">
+            <div class="obs-left">
+              <h3 class="obs-object">M47, Open cluster</h3>
+              <span class="obs-time">Jan 18 · 12:00 am</span>
+              <span class="obs-type">Open cluster</span>
+            </div>
+            <p class="obs-notes">
+             Another OC. Exhausted. Decided to get some shut eye. Till 2 am or so. Leo, Virgo, Coma B are calling !!
+            </p>
+          </article>
+
+          <article class="obs-entry">
+            <div class="obs-left">
+              <h3 class="obs-object">Leo Triplet</h3>
+              <span class="obs-time">Jan 18 · 1:20 am</span>
+              <span class="obs-type">Cluster of galaxies</span>
+            </div>
+            <p class="obs-notes">
+             All three galaxies in FOV. Very cool. Took some time to detect it, but NGC 3628 showed the central dark lane.
+            M66 was an elongated fuzz ball, and M65 was eliptical, but had to strain to see details. Its kinda cool, peering 
+            back in time, 35 million years ago. A poignant feeling
+            </p>
+          </article>
+          
+          <article class="obs-entry">
+            <div class="obs-left">
+              <h3 class="obs-object">M95 and M96</h3>
+              <span class="obs-time">Jan 18 · 1:40 am</span>
+              <span class="obs-type">Galaxies in Leo</span>
+            </div>
+            <p class="obs-notes">
+             Fuzz ball. No details at all. Seen only with averted vision
+            </p>
+          </article>          
+
+          <article class="obs-entry">
+            <div class="obs-left">
+              <h3 class="obs-object">M105 and NGC3373</h3>
+              <span class="obs-time">Jan 18 · 2:00 am</span>
+              <span class="obs-type">Galaxies in Leo</span>
+            </div>
+            <p class="obs-notes">
+             M105 barely detected. NGC3373 not detected
+            </p>
+          </article>
+
+          <article class="obs-entry">
+            <div class="obs-left">
+              <h3 class="obs-object">Markarian's chain</h3>
+              <span class="obs-time">Jan 18 · 2:30 am</span>
+              <span class="obs-type">Galaxies in Leo</span>
+            </div>
+            <p class="obs-notes">
+             Markarians chain in all its glory. NGC4388 looked beautiful, edge on. Visibly bright core. M86 looked very large 
+             and diffuse, washed out core in my opinion. M84, central core very apparent, but probably dimmer than NGC4388. 
+             Couple of other galaxies too. Spent a good 40 to 45 minutes here. Saw thru the 16" scope as well
+            </p>
+          </article>
+
+          <article class="obs-entry">
+            <div class="obs-left">
+              <h3 class="obs-object">M53</h3>
+              <span class="obs-time">Jan 18 · 3.30 am</span>
+              <span class="obs-type">Globular cluster</span>
+            </div>
+            <p class="obs-notes">
+             A dense globular. It actually looks like a central bright star with a ring of stars around it. And in the background 
+             you have thousands of stars, all closely bunched up. Very pretty. Would be a nice target for binoculars.
+            </p>
+          </article>
+
+          <article class="obs-entry">
+            <div class="obs-left">
+              <h3 class="obs-object">M64, Black eye galaxy</h3>
+              <span class="obs-time">Jan 18 · 4:00 am</span>
+              <span class="obs-type">Galaxy</span>
+            </div>
+            <p class="obs-notes">
+             Prominent central nucleus, (wonder why its called black eye) low brightness spiral arms. The contrast between the core and the sorrounding region was intersting
+            </p>
+          </article>
+
+          <article class="obs-entry">
+            <div class="obs-left">
+              <h3 class="obs-object">M104, Sombrero galaxy</h3>
+              <span class="obs-time">Jan 18 · 4:00 am</span>
+              <span class="obs-type">Galaxy</span>
+            </div>
+            <p class="obs-notes">
+             Needs no introdduction. The bulge above the nucleus, the diffuse glow, the central dark lane, it’s a visual treat. Tonight was not the best views I've had of this galaxy, but it was pretty good
+            </p>
+          </article>
+
+          <article class="obs-entry">
+            <div class="obs-left">
+              <h3 class="obs-object">M51, Whirlpool galaxy</h3>
+              <span class="obs-time">Jan 18 · 4:00 am</span>
+              <span class="obs-type">Galaxy</span>
+            </div>
+            <p class="obs-notes">
+             M51 and its interacting partner galaxy seen, core distinguished. Spiral arms of M51 seen but interaction between the two not seen. Tried at 150x and 200x (8mm ep)
+            </p>
+          </article>
+
+          <article class="obs-entry">
+            <div class="obs-left">
+              <h3 class="obs-object">M81 and M82</h3>
+              <span class="obs-time">Jan 18 · 4:15 am</span>
+              <span class="obs-type">Galaxy pair</span>
+            </div>
+            <p class="obs-notes">
+             M81 core was not as bright as earlier, but pretty obvious. Spiral arms seen. In the same FOV was M82
+            </p>
+          </article>
+
+          <article class="obs-entry">
+            <div class="obs-left">
+              <h3 class="obs-object">NGC2976</h3>
+              <span class="obs-time">Jan 18 · 4:15 am</span>
+              <span class="obs-type">Galaxy pair</span>
+            </div>
+            <p class="obs-notes">
+             Just 1 deg from M81. This is supposed to a very nice elliptical galaxy.  I was in the field, but did not detect anything. 16" scope maybe? Or am I just tired?
+            </p>
+          </article>
+
+          <article class="obs-entry">
+            <div class="obs-left">
+              <h3 class="obs-object">M94</h3>
+              <span class="obs-time">Jan 18 · 4:40 am</span>
+              <span class="obs-type">Galaxy pair</span>
+            </div>
+            <p class="obs-notes">
+             Bright core, spiral arms. Like a halo around it. While looking thru the eyepiece a meteor shout across the sky in my FOV. Interesting
+            </p>
+          </article>
+
+          <article class="obs-entry">
+            <div class="obs-left">
+              <h3 class="obs-object">Omega Centauri</h3>
+              <span class="obs-time">Jan 18 · 4:50 am</span>
+              <span class="obs-type">Globular cluster</span>
+            </div>
+            <p class="obs-notes">
+             Omega Centauri was well above the hills to the South. The pièce de résistance, no observation session is complete without viewing this baby. Globular cluster. 
+             Several people saw this. Decided to call it a night. That’s when I realized, I had completely forgotten Auriga. Oh well, theres tomorrow
+            </p>
+          </article>
+
+           <!-- ENDING HERE -->
+          </article>
+
+        </div>
+      </div>
+      <!-- END SESSION -->
+
+      <!-- This placeholder sits at the bottom until your next session -->
+      <!-- <div class="add-prompt"> -->
+        <!-- <strong>Next session goes here</strong> -->
+        <!-- After your next night out, copy the session block above, paste it here, -->
+        <!-- and fill in your new observations. -->
+      <!-- </div> -->
+
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <span class="footer-brand">Just<span>Astronomy</span></span>
+      <span class="footer-right">Bengaluru, India &nbsp;·&nbsp; Clear skies 🌠</span>
+    </div>
+  </footer>
+
+</body>
+</html>
