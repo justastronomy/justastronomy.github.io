@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New to Astronomy? — JustAstronomy</title>
+  <meta name="description" content="Find the right telescope or binoculars for your sky, budget and lifestyle. Honest advice from a fellow amateur.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@500;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+
+  <style>
+    /* =====================
+       SITE DESIGN SYSTEM (shared with index.html and log.html)
+    ===================== */
+    :root {
+      /* Site palette */
+      --bg:           #080c16;
+      --surface:      #0e1628;
+      --surface-2:    #141e35;
+      --accent:       #c9933a;
+      --text:         #e8e4d9;
+      --text-muted:   #8a93a8;
+      --border:       rgba(255, 255, 255, 0.07);
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-body:    'DM Sans', sans-serif;
+
+      /* Quiz-specific variables (used by the embedded tool below) */
+      --card:         #0c1422;
+      --card-border:  #1a2a40;
+      --accent2:      #6aabf7;
+      --green:        #52d68a;
+      --red:          #f47a7a;
+      --white:        #eef4ff;
+      --goto-color:   #c084fc;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.7;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* =====================
+       NAVIGATION
+    ===================== */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(8, 12, 22, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 24px; max-width: 900px; margin: 0 auto;
+    }
+    .nav-logo { font-family: var(--font-display); font-size: 22px; color: var(--text); }
+    .nav-logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a {
+      color: var(--text-muted); font-size: 13px; font-weight: 500;
+      letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.2s;
+    }
+    .nav-links a:hover,
+    .nav-links a.active { color: var(--accent); text-decoration: none; }
+
+    /* =====================
+       PAGE HEADER
+    ===================== */
+    .page-header {
+      max-width: 900px; margin: 0 auto;
+      padding: 72px 24px 0;
+    }
+    .page-eyebrow {
+      font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--accent); font-weight: 500; margin-bottom: 12px;
+    }
+    .page-header h1 {
+      font-family: var(--font-display);
+      font-size: clamp(36px, 6vw, 60px);
+      font-weight: 600; line-height: 1.08; margin-bottom: 16px;
+    }
+    .page-header p {
+      color: var(--text-muted); font-size: 16px;
+      max-width: 540px; line-height: 1.75; margin-bottom: 8px;
+    }
+    .bas-credit {
+      font-size: 12px; color: var(--text-muted);
+      letter-spacing: 0.04em; margin-bottom: 48px;
+    }
+    .bas-credit a { color: var(--accent2, #6aabf7); }
+
+    /* =====================
+       QUIZ WRAPPER
+       The quiz lives inside this div.
+       Its own CSS variables are defined in :root above.
+    ===================== */
+    .quiz-wrapper {
+      position: relative;
+      min-height: 60vh;
+    }
+
+    /* Star canvas — full page, behind everything */
+    #stars {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0; pointer-events: none;
+    }
+
+    /* Quiz container — sits above the star canvas */
+    .quiz-container {
+      position: relative; z-index: 1;
+      max-width: 740px;
+      margin: 0 auto;
+      padding: 0 1.5rem 4rem;
+    }
+
+    /* ── Progress ── */
+    .progress-meta {
+      display: flex; justify-content: space-between;
+      font-size: 0.78rem; color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+    .progress-track {
+      height: 3px; background: var(--card-border);
+      border-radius: 99px; overflow: hidden;
+      margin-bottom: 2.25rem;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      border-radius: 99px;
+      transition: width 0.45s cubic-bezier(.4,0,.2,1);
+    }
+
+    /* ── Question card ── */
+    .q-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 2.5rem 2.25rem;
+      animation: slideUp 0.32s cubic-bezier(.4,0,.2,1);
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .q-eyebrow {
+      font-size: 0.72rem; letter-spacing: 2.5px;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: 0.7rem; font-weight: 600;
+    }
+    .q-text {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.2rem, 3.5vw, 1.55rem);
+      color: var(--white); line-height: 1.3; margin-bottom: 0.5rem;
+    }
+    .q-hint {
+      font-size: 0.875rem; color: var(--text-muted);
+      line-height: 1.6; margin-bottom: 1.75rem;
+    }
+    .q-callout {
+      background: rgba(192, 132, 252, 0.07);
+      border: 1px solid rgba(192, 132, 252, 0.25);
+      border-radius: 10px; padding: 0.9rem 1.1rem;
+      font-size: 0.84rem; color: var(--text-muted);
+      line-height: 1.65; margin-bottom: 1.5rem;
+    }
+    .q-callout strong { color: var(--goto-color); }
+
+    /* ── Options ── */
+    .options { display: flex; flex-direction: column; gap: 0.65rem; }
+    .opt-btn {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 1rem 1.2rem;
+      background: transparent;
+      border: 1px solid var(--card-border);
+      border-radius: 11px; cursor: pointer;
+      text-align: left; color: var(--text);
+      font-family: var(--font-body);
+      font-size: 0.94rem;
+      transition: border-color 0.2s, background 0.2s, color 0.2s;
+    }
+    .opt-btn:hover {
+      border-color: var(--accent);
+      background: rgba(201, 147, 58, 0.07);
+      color: var(--white);
+    }
+    .opt-btn.goto-opt:hover {
+      border-color: var(--goto-color);
+      background: rgba(192, 132, 252, 0.07);
+    }
+    .opt-icon  { font-size: 1.45rem; flex-shrink: 0; line-height: 1; }
+    .opt-label { font-weight: 500; display: block; margin-bottom: 0.1rem; }
+    .opt-desc  { font-size: 0.82rem; color: var(--text-muted); display: block; line-height: 1.4; }
+    .opt-btn.opt-selected {
+      border-color: var(--accent);
+      background: rgba(201, 147, 58, 0.12);
+      color: var(--white);
+    }
+    .opt-btn.goto-opt.opt-selected {
+      border-color: var(--goto-color);
+      background: rgba(192, 132, 252, 0.12);
+    }
+    .opt-check {
+      margin-left: auto; flex-shrink: 0;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--accent); color: #05090f;
+      font-size: 0.75rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .opt-btn.goto-opt.opt-selected .opt-check { background: var(--goto-color); }
+
+    /* ── Nav row ── */
+    .nav-row { display: flex; margin-top: 1.4rem; }
+    .btn-back {
+      background: none; border: none;
+      color: var(--text-muted); cursor: pointer;
+      font-family: var(--font-body);
+      font-size: 0.88rem; padding: 0.3rem 0; transition: color 0.2s;
+    }
+    .btn-back:hover { color: var(--text); }
+
+    /* ── Results ── */
+    #result-section { animation: slideUp 0.4s cubic-bezier(.4,0,.2,1); }
+    .result-header { text-align: center; margin-bottom: 2.25rem; }
+    .result-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.6rem, 4vw, 2.1rem);
+      color: var(--white); margin-bottom: 0.4rem;
+    }
+    .result-header p { color: var(--text-muted); font-size: 0.92rem; }
+
+    .reco-cards { display: flex; flex-direction: column; gap: 1.3rem; }
+    .reco-card {
+      background: var(--card); border: 1px solid var(--card-border);
+      border-radius: 18px; padding: 2rem 2rem 1.75rem;
+    }
+    .reco-card.is-primary { border-color: var(--accent); }
+    .reco-card.is-goto    { border-color: var(--goto-color); }
+
+    .reco-tag {
+      display: inline-block; font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 1.8px; text-transform: uppercase;
+      padding: 0.28rem 0.8rem; border-radius: 99px; margin-bottom: 1rem;
+    }
+    .tag-top    { background: rgba(201,147,58,.14);  color: var(--accent); }
+    .tag-alt    { background: rgba(106,171,247,.14); color: var(--accent2); }
+    .tag-budget { background: rgba(82,214,138,.14);  color: var(--green); }
+    .tag-goto   { background: rgba(192,132,252,.14); color: var(--goto-color); }
+    .tag-future { background: rgba(106,171,247,.10); color: var(--accent2); }
+
+    .reco-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.35rem; color: var(--white); margin-bottom: 0.2rem;
+    }
+    .reco-cat {
+      font-size: 0.75rem; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.8rem;
+    }
+    .reco-price { font-size: 1rem; font-weight: 600; color: var(--accent); margin-bottom: 1rem; }
+    .reco-verdict {
+      font-size: 0.92rem; line-height: 1.7; color: var(--text);
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--card-border); margin-bottom: 1.25rem;
+    }
+    .pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+    .pros h4, .cons h4 {
+      font-size: 0.72rem; text-transform: uppercase;
+      letter-spacing: 1.5px; font-weight: 700; margin-bottom: 0.55rem;
+    }
+    .pros h4 { color: var(--green); }
+    .cons h4 { color: var(--red); }
+    .pros ul, .cons ul { list-style: none; }
+    .pros li, .cons li {
+      font-size: 0.84rem; color: var(--text-muted);
+      padding-left: 1.1rem; position: relative;
+      margin-bottom: 0.35rem; line-height: 1.45;
+    }
+    .pros li::before { content: '✓'; position: absolute; left: 0; color: var(--green); top: 1px; font-size: 0.75rem; }
+    .cons li::before { content: '✗'; position: absolute; left: 0; color: var(--red);   top: 1px; font-size: 0.75rem; }
+
+    .reco-note {
+      margin: 1.25rem 0; padding: 0.85rem 1rem;
+      background: rgba(106,171,247,0.07);
+      border: 1px solid rgba(106,171,247,0.22);
+      border-radius: 9px; font-size: 0.83rem;
+      color: var(--text-muted); line-height: 1.6;
+    }
+    .reco-note strong { color: var(--accent2); }
+    .reco-note-goto {
+      margin: 1.25rem 0; padding: 0.85rem 1rem;
+      background: rgba(192,132,252,0.07);
+      border: 1px solid rgba(192,132,252,0.22);
+      border-radius: 9px; font-size: 0.83rem;
+      color: var(--text-muted); line-height: 1.6;
+    }
+    .reco-note-goto strong { color: var(--goto-color); }
+
+    .retailers-box {
+      margin-top: 2rem; background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 14px; padding: 1.4rem 1.6rem;
+      font-size: 0.87rem; line-height: 1.65; color: var(--text-muted);
+    }
+    .retailers-box strong { color: var(--text); }
+
+    .restart-row { text-align: center; margin-top: 2rem; }
+    .btn-restart {
+      background: none; border: 1px solid var(--card-border);
+      border-radius: 9px; padding: 0.75rem 2.25rem;
+      color: var(--text-muted); cursor: pointer;
+      font-family: var(--font-body); font-size: 0.9rem;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-restart:hover { border-color: var(--accent); color: var(--accent); }
+
+    .share-row {
+      display: flex; gap: 0.75rem; justify-content: center;
+      margin-top: 1.5rem; flex-wrap: wrap;
+    }
+    .btn-share {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.7rem 1.5rem; border-radius: 9px; cursor: pointer;
+      font-family: var(--font-body); font-size: 0.88rem;
+      font-weight: 500; transition: all 0.2s;
+    }
+    .btn-share-pdf {
+      background: rgba(201,147,58,0.1); border: 1px solid rgba(201,147,58,0.4); color: var(--accent);
+    }
+    .btn-share-pdf:hover { background: rgba(201,147,58,0.18); }
+    .btn-share-native {
+      background: rgba(106,171,247,0.1); border: 1px solid rgba(106,171,247,0.4); color: var(--accent2);
+    }
+    .btn-share-native:hover { background: rgba(106,171,247,0.18); }
+
+    
+
+    /* Quiz internal attribution line */
+    .quiz-attribution {
+      text-align: center; margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--card-border);
+      font-size: 0.78rem; color: var(--text-muted);
+    }
+    .quiz-attribution a { color: var(--accent2); text-decoration: none; }
+
+    /* =====================
+       SITE FOOTER
+    ===================== */
+    .site-footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 0; margin-top: 40px;
+      position: relative; z-index: 1;
+    }
+    .footer-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      max-width: 900px; margin: 0 auto; padding: 0 24px;
+    }
+    .footer-brand { font-family: var(--font-display); font-size: 18px; color: var(--text-muted); }
+    .footer-brand span { color: var(--accent); }
+    .footer-right { font-size: 13px; color: var(--text-muted); }
+
+    /* =====================
+       PRINT STYLES (from original quiz)
+    ===================== */
+    @media print {
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      canvas, #stars, .btn-back, .btn-restart, .share-row,
+      .progress-meta, .progress-track, #quiz-section,
+      nav, .page-header, .site-footer { display: none !important; }
+      body { background: #fff !important; color: #111 !important; font-family: Georgia, serif; }
+      .quiz-container { max-width: 100% !important; padding: 1cm 1.5cm !important; }
+      .bas-logo-name { color: #b07800 !important; }
+      .bas-logo-sub  { color: #555 !important; }
+      header h1      { color: #111 !important; }
+      .bas-logo-img  { filter: invert(1) !important; }
+      #print-summary { display: block !important; }
+      .result-header h2 { color: #111 !important; }
+      .result-header p  { color: #555 !important; }
+      .reco-card { border: 1px solid #ccc !important; background: #fff !important; break-inside: avoid; margin-bottom: 1cm; }
+      .reco-card.is-primary { border-color: #b07800 !important; }
+      .reco-card.is-goto    { border-color: #7c3aed !important; }
+      .tag-top  { background: #fff3cd !important; color: #7c5c00 !important; }
+      .tag-alt  { background: #dbeafe !important; color: #1e40af !important; }
+      .tag-goto { background: #ede9fe !important; color: #5b21b6 !important; }
+      .tag-budget { background: #dcfce7 !important; color: #166534 !important; }
+      .reco-name  { color: #111 !important; }
+      .reco-cat   { color: #555 !important; }
+      .reco-price { color: #b07800 !important; }
+      .reco-verdict { color: #222 !important; border-bottom-color: #ddd !important; }
+      .pros h4 { color: #166534 !important; }
+      .cons h4 { color: #991b1b !important; }
+      .pros li, .cons li { color: #333 !important; }
+      .reco-note { background: #f0f7ff !important; border-color: #93c5fd !important; color: #1e3a5f !important; }
+      .reco-note-goto { background: #faf5ff !important; border-color: #c4b5fd !important; color: #3b1f6b !important; }
+      .retailers-box { background: #f9fafb !important; border-color: #ddd !important; color: #333 !important; }
+    }
+
+    @media (max-width: 640px) {
+      .nav-links    { display: none; }
+      .pros-cons    { grid-template-columns: 1fr; }
+      .q-card, .reco-card { padding: 1.6rem 1.25rem; }
+      .footer-inner { flex-direction: column; gap: 12px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVIGATION -->
+  <nav>
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">Just<span>Astronomy</span></a>
+      <ul class="nav-links">
+        <li><a href="log.html">Log</a></li>
+        <li><a href="dso.html">Deep Sky</a></li>
+        <li><a href="meteors.html">Meteors</a></li>
+        <li><a href="equipment.html">Equipment</a></li>
+        <li><a href="beginners.html" class="active">New Here?</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <p class="page-eyebrow">Getting started</p>
+    <h1>New to Astronomy?</h1>
+    <p>Answer a few questions and get an honest, personalised recommendation for your first telescope or binoculars — matched to your sky, budget and lifestyle.</p>
+    <p class="bas-credit">From one amateur to another — no affiliates, no sales pitch, no spin.</p>
+  </div>
+
+  <!-- QUIZ WRAPPER -->
+  <div class="quiz-wrapper">
+    <canvas id="stars"></canvas>
+
+    <div class="quiz-container">
+      <div id="quiz-section">
+        <div class="progress-meta">
+          <span id="q-label">Question 1</span>
+          <span id="q-of"></span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+        </div>
+        <div id="question-container"></div>
+      </div>
+
+      <div id="result-section" style="display:none"></div>
+
+      <div class="quiz-attribution">
+        From one amateur to another — no affiliates, no sales pitch, no spin.
+      </div>
+    </div><!-- end quiz-container -->
+  </div><!-- end quiz-wrapper -->
+
+  <!-- SITE FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-brand">Just<span>Astronomy</span></span>
+      <span class="footer-right">Bengaluru, India &nbsp;·&nbsp; Clear skies 🌠</span>
+    </div>
+  </footer>
+
+<script>
+/* ── Star field ───────────────────────────────────── */
+(function () {
+  const cv = document.getElementById('stars');
+  const cx = cv.getContext('2d');
+  let stars = [];
+  function resize() { cv.width = window.innerWidth; cv.height = window.innerHeight; }
+  function seed() {
+    stars = [];
+    for (let i = 0; i < 200; i++) stars.push({
+      x: Math.random() * cv.width, y: Math.random() * cv.height,
+      r: Math.random() * 1.3 + 0.2,
+      a: Math.random() * 0.65 + 0.2,
+      spd: Math.random() * 0.004 + 0.001,
+      dir: Math.random() > 0.5 ? 1 : -1
+    });
+  }
+  function draw() {
+    cx.clearRect(0, 0, cv.width, cv.height);
+    stars.forEach(s => {
+      s.a += s.spd * s.dir;
+      if (s.a > 0.88 || s.a < 0.1) s.dir *= -1;
+      cx.beginPath(); cx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      cx.fillStyle = `rgba(190,215,255,${s.a})`; cx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  resize(); seed(); draw();
+  window.addEventListener('resize', () => { resize(); seed(); });
+})();
+
+
+/* ══════════════════════════════════════════════════
+   QUESTIONS
+   ══════════════════════════════════════════════════ */
+const ALL_QUESTIONS = {
+
+  who: {
+    id: 'who',
+    text: 'Who is this instrument for?',
+    hint: 'This helps us tailor the recommendation to the right person.',
+    options: [
+      { v: 'myself', icon: '🔭', label: 'For myself',               desc: 'I want to get into astronomy' },
+      { v: 'child',  icon: '🧒', label: 'For a child in my family', desc: 'My son, daughter, niece, nephew…' },
+      { v: 'gift',   icon: '🎁', label: 'A gift for someone else',   desc: 'A friend, colleague, or relative' }
+    ]
+  },
+
+  age: {
+    id: 'age',
+    text: 'How old is this person?',
+    hint: 'Age affects what equipment is safe, manageable, and appropriate.',
+    options: [
+      { v: 'under8',  icon: '🌟', label: 'Under 8 years old',  desc: 'Young children need simple, light instruments' },
+      { v: '8to12',   icon: '📚', label: '8 to 12 years old',   desc: 'Can handle more, but keep it simple' },
+      { v: '13to17',  icon: '🚀', label: '13 to 17 years old',  desc: 'Teenagers can use most equipment' },
+      { v: 'adult',   icon: '👤', label: '18 and above',        desc: 'Full range of options available' }
+    ]
+  },
+
+  experience: {
+    id: 'experience',
+    text: 'How much astronomy experience does this person have?',
+    hint: "Be honest — there's no wrong answer. We just want to match the right level of complexity.",
+    options: [
+      { v: 'none',   icon: '🌱', label: 'Absolute beginner', desc: "Barely knows the difference between a star and a planet" },
+      { v: 'casual', icon: '🌙', label: 'Casual stargazer',  desc: 'Knows some constellations, may have looked through a scope before' },
+      { v: 'some',   icon: '⭐', label: 'Some experience',   desc: 'Been to a star party, comfortable with basic equipment' }
+    ]
+  },
+
+  budget: {
+    id: 'budget',
+    text: 'What is your budget?',
+    hint: 'This is for the instrument only. Accessories — extra eyepieces, red torch, star atlas — can come later.',
+    options: [
+      { v: 'under10k',  icon: '💰', label: 'Under ₹10,000',        desc: 'Entry level — honest options exist here' },
+      { v: '10to40k',   icon: '💰', label: '₹10,000 – ₹40,000',    desc: 'Solid beginner to intermediate range' },
+      { v: '40to60k',   icon: '💰', label: '₹40,000 – ₹60,000',    desc: 'Serious equipment within reach' },
+      { v: '60to100k',  icon: '💰', label: '₹60,000 – ₹1,00,000',  desc: 'Near-professional visual astronomy gear' },
+      { v: 'over100k',  icon: '💰', label: 'Over ₹1,00,000',       desc: 'The sky is quite literally the limit' }
+    ]
+  },
+
+  location: {
+    id: 'location',
+    text: 'Where will you mostly observe from?',
+    hint: 'Light pollution dramatically changes what you can see — and what equipment makes sense.',
+    options: [
+      { v: 'city',      icon: '🏙️', label: 'City or suburb only',              desc: 'Heavy light pollution — Moon, planets, bright clusters' },
+      { v: 'semi_dark', icon: '🌆', label: 'Occasionally travel to dark skies', desc: 'Drive 1–2 hours to escape city glow a few times a year' },
+      { v: 'dark',      icon: '🌌', label: 'Regularly at dark sites',           desc: 'Rural areas, Coorg-style skies, Milky Way overhead' }
+    ]
+  },
+
+  transport: {
+    id: 'transport',
+    text: 'How will you move your equipment around?',
+    hint: "A large Dobsonian is wonderful — but useless if you can't get it to a dark site.",
+    options: [
+      { v: 'no_car',    icon: '🚶', label: 'By foot, bike, or public transport', desc: 'Portability is critical — size and weight are real constraints' },
+      { v: 'car',       icon: '🚗', label: 'I have a car',                        desc: 'Can carry moderately sized equipment, up to a 6" Dobsonian' },
+      { v: 'car_large', icon: '🚙', label: 'Car, and happy with heavy gear',      desc: 'Can carry 20–30 kg for the best possible views' }
+    ]
+  },
+
+  storage: {
+    id: 'storage',
+    text: 'How much storage space do you have at home?',
+    hint: "A large telescope you can't conveniently store will end up gathering dust.",
+    options: [
+      { v: 'small', icon: '🏠', label: 'Small flat or apartment', desc: 'Needs to fit in a cupboard or corner — size really matters' },
+      { v: 'ample', icon: '🏡', label: 'House with ample storage', desc: 'Can dedicate a room, shed, or garage to equipment' }
+    ]
+  },
+
+  // ── GoTo preference — only shown for budgets ≥ ₹40,000 ──
+  goto_pref: {
+    id: 'goto_pref',
+    text: 'How do you want to navigate the night sky?',
+    hint: 'One of the most personal choices in amateur astronomy. Both paths are completely valid.',
+    callout: '<strong>Manual / Star-hopping:</strong> You navigate from known stars to your target using skill and a star chart. Takes time to learn, but builds deep sky knowledge. No batteries. Never breaks. Most experienced observers prefer this.<br><br><strong>GoTo (Computerised):</strong> The motorised mount finds objects automatically at the press of a button. Great for casual evenings, sharing the sky with family, and when you just want to observe without the navigation.',
+    options: [
+      { v: 'manual', icon: '🗺️', label: 'Manual — I want to learn the sky',       desc: 'Star-hop to targets. More rewarding, builds real knowledge. No batteries needed.', cls: '' },
+      { v: 'goto',   icon: '🤖', label: 'GoTo — let the telescope find objects',   desc: 'Motorised mount points to any of thousands of objects at the push of a button.', cls: 'goto-opt' }
+    ]
+  },
+
+  interest: {
+    id: 'interest',
+    text: 'What do you most want to see?',
+    hint: 'Pick whatever excites you most right now. You can always explore everything later.',
+    options: [
+      { v: 'moon_planets', icon: '🪐', label: 'Moon & Planets',               desc: "Saturn's rings, Jupiter's cloud bands, craters on the Moon" },
+      { v: 'clusters',     icon: '✨', label: 'Star clusters & the Milky Way', desc: 'Pleiades, Orion Belt stars, sweeping the Milky Way' },
+      { v: 'deep_sky',     icon: '🌌', label: 'Deep sky — galaxies & nebulae', desc: 'Andromeda Galaxy, Orion Nebula, globular clusters' },
+      { v: 'everything',   icon: '🔭', label: 'Everything — show me it all!',  desc: 'Happy to explore whatever the sky has to offer' }
+    ]
+  }
+
+};
+
+const GOTO_BUDGETS = ['40to60k', '60to100k', 'over100k'];
+
+
+/* ══════════════════════════════════════════════════
+   FLOW — question order, branches on answers
+   ══════════════════════════════════════════════════ */
+function getFlow(a) {
+  const flow = ['who', 'age'];
+
+  if (a.age !== 'under8') flow.push('experience');
+
+  flow.push('budget');
+
+  if (a.age !== 'under8' && a.budget !== 'under10k') {
+    flow.push('location');
+    flow.push('transport');
+    flow.push('storage');
+    // GoTo question only where it is actually viable and affordable
+    if (GOTO_BUDGETS.includes(a.budget)) {
+      flow.push('goto_pref');
+    }
+  }
+
+  if (a.age !== 'under8') flow.push('interest');
+
+  return flow;
+}
+
+
+/* ══════════════════════════════════════════════════
+   RECOMMENDATION ENGINE
+   ══════════════════════════════════════════════════ */
+function getRecommendations(a) {
+
+  const isCompact   = (a.transport === 'no_car' || a.storage === 'small');
+  const hasCar      = (a.transport === 'car' || a.transport === 'car_large');
+  const hasDarkSky  = (a.location === 'dark' || a.location === 'semi_dark');
+  const cityOnly    = (a.location === 'city');
+  const wantsGoTo   = (a.goto_pref === 'goto');
+
+  // ── Under 8 ────────────────────────────────────
+  if (a.age === 'under8') {
+    return [
+      {
+        tag: 'Right for Young Children', tagClass: 'tag-top', cardClass: 'is-primary',
+        name: 'Compact Binoculars — 7×35 or 8×40',
+        cat: 'Binoculars',
+        price: '₹3,000 – ₹8,000',
+        verdict: 'For a child under 8, binoculars are the only honest recommendation. They are intuitive (two eyes, natural view), lightweight, impossible to set up wrong, and require zero alignment. The Moon\'s craters will delight any young child, and bright clusters look like scattered jewels. Look for 7×35 or 8×40 sizes — manageable for small hands. Brands like Olympus or Nikon make reliable options in this range.',
+        pros: ['Lightweight, safe for small hands', 'Instant use — zero setup', 'Natural two-eyed viewing', 'Shows Moon, clusters, and Milky Way beautifully'],
+        cons: ['Limited magnification versus a telescope', 'Cannot show Saturn\'s rings clearly']
+      },
+      {
+        tag: 'A Note for Later', tagClass: 'tag-future', cardClass: '',
+        name: 'Come back in a year or two!',
+        cat: 'Future Planning',
+        price: '',
+        verdict: "The best first telescope for a child under 8 is the one that doesn't frustrate them. Let them enjoy binoculars, attend attend a star party, and look through other people's scopes. When their curiosity has genuinely grown — come back and run this guide again. A 9 or 10-year-old can handle a small tabletop Dobsonian beautifully, and they'll appreciate it so much more.",
+        pros: ['Builds genuine passion before investing more', 'Avoids early frustration with complex gear', 'Saves money for when the telescope will actually be used'],
+        cons: ['Patience required — but it is absolutely worth it']
+      }
+    ];
+  }
+
+  // ── Under ₹10,000 ──────────────────────────────
+  if (a.budget === 'under10k') {
+    return [
+      {
+        tag: 'Our Recommendation', tagClass: 'tag-top', cardClass: 'is-primary',
+        name: 'Celestron SkyMaster 10×50',
+        cat: 'Binoculars — Astronomy Grade',
+        price: '₹5,000 – ₹7,500',
+        verdict: "At this budget, we'll be direct: no telescope worth buying exists under ₹10,000. The cheap scopes in this range sit on wobbly tripods, have poor optics, and are far more likely to kill interest in astronomy than spark it. A good pair of 10×50 binoculars, however, is genuinely wonderful. The Moon will take your breath away, the Pleiades become a glittering jewel box, and the Milky Way sweeps through as a river of stars.",
+        note: "If you use these on a tripod, choose one whose rated payload capacity is at least 20% more than the weight of your binoculars. Reputable brands to look at include Manfrotto, Gitzo, and Adofys. A flimsy tripod defeats the purpose entirely.",
+        pros: ['Exceptional value for money', 'Instant use — zero setup', 'Moon, clusters, Milky Way, and even the Andromeda Galaxy', 'Will complement any telescope you buy later'],
+        cons: ['Cannot show planetary detail like a telescope', 'Needs a tripod at 10× for really steady views']
+      },
+      {
+        tag: 'Stretch Your Budget', tagClass: 'tag-alt', cardClass: '',
+        name: 'Nikon Aculon A211 10×50',
+        cat: 'Binoculars — Premium Entry',
+        price: '₹8,000 – ₹10,500',
+        verdict: 'If you can stretch a little, the Nikon Aculon offers noticeably better optics and build quality. Multi-coated lenses give brighter, sharper images — especially near the edge of the field. A meaningful upgrade, and a pair that will last years of regular use.',
+        note: "If you use these on a tripod, always check the tripod's rated payload capacity — it should be at least 20% more than the weight of your binoculars. Reputable brands to consider: Manfrotto, Gitzo, and Adofys.",
+        pros: ['Better optics than generic brands', 'Durable, well-made body', 'Nikon reliability and service network in India'],
+        cons: ['Costs more', 'Still a binocular — planets will be small']
+      }
+    ];
+  }
+
+  // ── ₹10,000 – ₹40,000 ─────────────────────────
+  if (a.budget === '10to40k') {
+    const isYoungOrBeginner = (a.age === '8to12' || a.experience === 'none');
+
+    if (isYoungOrBeginner || isCompact || cityOnly) {
+      return [
+        {
+          tag: 'Best Starting Point', tagClass: 'tag-top', cardClass: 'is-primary',
+          name: 'Celestron SkyMaster 15×70 + Tripod Adapter',
+          cat: 'Binoculars — Large Astronomy Grade',
+          price: '₹9,000 – ₹14,000',
+          verdict: "The 15×70 is a large binocular beloved by experienced amateurs worldwide — not a toy. These will outperform most entry-level telescopes in this price range. The Moon is breathtaking. Open clusters pop. From semi-dark skies, you can even spot the Andromeda Galaxy as a hazy oval. Needs a tripod for steady use, but that's a small price for what you get.",
+          note: "Always check a tripod's rated payload capacity before buying — it should be at least 20% more than the weight of your binoculars. A flimsy tripod ruins the experience as thoroughly as bad optics. Reputable brands to consider: Manfrotto, Gitzo, and Adofys.",
+          pros: ['Far better than any cheap telescope at this budget', 'Two-eyed, natural, intuitive viewing', 'Wide-field views of clusters and the Milky Way', 'A great complement to any future telescope'],
+          cons: ['Must be used on a tripod for steady views', 'Heavy for young children to hand-hold', 'Limited on high-magnification planetary detail']
+        },
+        {
+          tag: 'First Telescope Option', tagClass: 'tag-alt', cardClass: '',
+          name: 'Sky-Watcher Heritage 130P Tabletop Dobsonian',
+          cat: 'Telescope — Tabletop Dobsonian Reflector',
+          price: '₹18,000 – ₹26,000',
+          verdict: "A compact, punchy Dobsonian that sits on a table, a wall, or the boot of a car. 130mm of aperture is genuinely impressive at this price — you'll see the Orion Nebula as a glowing cloud, begin to resolve globular clusters, and get very satisfying planetary views. A huge step up from anything tripod-mounted in this range. Well-regarded worldwide as a first telescope.",
+          pros: ['Great aperture for the price', 'Compact and easy to carry', 'Quick setup, simple to use', 'Much better value than any tripod-mounted refractor here'],
+          cons: ['Needs a table or elevated surface to place on', 'Not suited to balconies without a ledge', 'Needs occasional collimation (easy, about 5 minutes)']
+        }
+      ];
+    }
+
+    // Dark skies + car + some experience
+    return [
+      {
+        tag: 'Best Value', tagClass: 'tag-top', cardClass: 'is-primary',
+        name: 'Sky-Watcher Heritage 130P Tabletop Dobsonian',
+        cat: 'Telescope — Tabletop Dobsonian Reflector',
+        price: '₹18,000 – ₹26,000',
+        verdict: "A compact, powerful Dobsonian that sits on a table or the boot of your car. 130mm of aperture is genuinely impressive — the Orion Nebula becomes a glowing cloud, globular clusters begin to resolve into individual stars, and planetary views are excellent. Regarded as one of the best beginner telescopes in the world. Great fun at a star party.",
+        pros: ['Impressive aperture for the price', 'Compact tabletop design — easy to carry', 'Quick setup, very little to learn', 'Excellent at dark sky sites'],
+        cons: ['Needs a table or car boot to rest on', 'Not ideal for high-rise flat use', 'Needs occasional collimation']
+      },
+      {
+        tag: 'Step Up', tagClass: 'tag-alt', cardClass: '',
+        name: 'Sky-Watcher 6" Dobsonian (150mm / f8)',
+        cat: 'Telescope — Dobsonian Reflector',
+        price: '₹25,000 – ₹36,000',
+        verdict: "If your budget stretches here, this is the real deal. A 6\" Dob is a beloved all-purpose visual telescope that will keep you busy for years. It's the instrument experienced club members will nod approvingly at when you bring it to a star party.",
+        pros: ['Noticeably better views than the 130P', 'Simple, robust, almost no maintenance', 'Great for deep sky at dark sites'],
+        cons: ['Bulky — needs a car to transport', 'Taller tube can be awkward for shorter observers']
+      },
+      {
+        tag: 'Wide-Field Companion', tagClass: 'tag-budget', cardClass: '',
+        name: 'Celestron SkyMaster 15×70 Binoculars',
+        cat: 'Binoculars — Wide Field',
+        price: '₹9,000 – ₹13,000',
+        verdict: "Don't overlook large binoculars even when buying a telescope. Many experienced observers keep a 15×70 alongside their scope for wide-field sweeping. Some objects — large nebulae, open clusters — actually look better in binoculars than in a telescope.",
+        note: "Always check a tripod's rated payload capacity before buying — it should be at least 20% more than the weight of your binoculars. A flimsy tripod ruins the experience as thoroughly as bad optics. Reputable brands to consider: Manfrotto, Gitzo, and Adofys.",
+        pros: ['Perfect wide-field complement to a telescope', 'No setup, grab-and-go anytime', 'Superb Milky Way sweeping'],
+        cons: ['Needs a tripod for steady use', 'Not a telescope replacement on planets']
+      }
+    ];
+  }
+
+  // ── ₹40,000 – ₹60,000 ─────────────────────────
+  if (a.budget === '40to60k') {
+
+    if (wantsGoTo) {
+      return [
+        {
+          tag: 'GoTo — Our Recommendation', tagClass: 'tag-goto', cardClass: 'is-goto',
+          goto_note: "GoTo mounts contain motors and electronics, making them noticeably heavier than equivalent manual mounts — factor this into your transport plans. More importantly, they require continuous power. Batteries run down, and mains electricity is simply unavailable at remote dark sky sites. Most GoTo observers carry a dedicated astronomy power tank or compact UPS — add that to your kit list and budget. At a dark site, a manual Dobsonian will always be ready; a GoTo scope needs its power problem solved first.",
+          name: 'Celestron NexStar 4SE',
+          cat: 'Telescope — GoTo Maksutov-Cassegrain',
+          price: '₹55,000 – ₹72,000',
+          verdict: "A beautiful instrument. The NexStar 4SE is a 102mm Mak-Cass on Celestron's iconic single-arm GoTo mount. Select Saturn from the handset, and the telescope swings smoothly to it and tracks it as the Earth turns. Perfect for casual family evenings and for sharing the sky with people who have no astronomy background. Excellent on planets, the Moon, and double stars.",
+          pros: ['Automated — finds and tracks objects at a button press', 'Great for casual, social stargazing evenings', 'Compact, elegant single-arm design', 'Excellent planetary and lunar views'],
+          cons: ['Needs alignment setup each session (10–15 min)', 'Requires batteries or a power supply', 'Limited deep-sky performance compared to a Dob of equal cost', 'More expensive per mm of aperture than a manual scope']
+        },
+        {
+          tag: 'More Affordable GoTo', tagClass: 'tag-alt', cardClass: '',
+          name: 'Sky-Watcher AZ-GTi Mount + Mak 90 OTA',
+          cat: 'Telescope — WiFi GoTo Mak-Cassegrain',
+          price: '₹38,000 – ₹50,000',
+          verdict: "A smarter way to get GoTo at this budget. The AZ-GTi is a compact WiFi mount controlled from your phone — no handset needed. Paired with the Mak 90, it's a portable, surprisingly capable GoTo system. The mount can also be upgraded later with a different optical tube as your interests grow.",
+          pros: ['WiFi-controlled from your smartphone', 'More affordable than the NexStar 4SE', 'Compact — fits in a backpack', 'Mount reusable with other OTAs in future'],
+          cons: ['90mm aperture is smaller than the NexStar 4SE\'s 102mm', 'App dependency — needs phone battery and WiFi', 'Less premium feel than the Celestron']
+        }
+      ];
+    }
+
+    // Manual — compact or city
+    if (isCompact || cityOnly) {
+      return [
+        {
+          tag: 'Our Top Pick', tagClass: 'tag-top', cardClass: 'is-primary',
+          name: 'Sky-Watcher Maksutov 127mm (Mak 127)',
+          cat: 'Telescope — Mak-Cassegrain',
+          price: '₹35,000 – ₹48,000',
+          verdict: "The Mak 127 is a phenomenal planetary telescope in a shockingly compact body. Saturn's rings, the Cassini Division, Jupiter's Great Red Spot, the polar ice caps of Mars — all clearly visible under steady skies. For city observers without a car, this is very close to the ideal instrument. It closes up and stores neatly, can be carried in a shoulder bag, and produces views that will astonish anyone you share it with.",
+          pros: ['Outstanding planetary and double-star performance', 'Compact — fits in a shoulder bag', 'Sealed optics — almost zero maintenance', 'Brilliant from a balcony or terrace'],
+          cons: ['Needs 45–60 minutes to reach outside temperature', 'Not a wide-field instrument', 'Deep-sky performance limited in city skies']
+        },
+        {
+          tag: 'Best of Both Worlds', tagClass: 'tag-alt', cardClass: '',
+          name: 'Sky-Watcher Heritage 130P + Celestron 15×70 Binoculars',
+          cat: 'Telescope + Binoculars Combo',
+          price: '₹27,000 – ₹38,000 combined',
+          verdict: "Consider pairing the Heritage 130P with a 15×70 binocular. A solid tabletop reflector for planetary and cluster views, plus wide-field binoculars for sweeping the Milky Way. Two instruments are often more satisfying than one.",
+          note: "The 15×70 binoculars will need a tripod. Always check the tripod's rated payload capacity — it should be at least 20% more than the weight of your binoculars. Reputable brands to consider: Manfrotto, Gitzo, and Adofys.",
+          pros: ['Versatile — best of both worlds', 'Good total aperture for the price', 'Binoculars always ready alongside the scope'],
+          cons: ['Two things to set up and carry', 'Heritage 130P needs an elevated surface', '15×70 binoculars need a tripod for steady use']
+        }
+      ];
+    }
+
+    // Manual — dark skies + transport
+    return [
+      {
+        tag: 'The Clear Winner', tagClass: 'tag-top', cardClass: 'is-primary',
+        name: 'Sky-Watcher 8" Dobsonian (200mm / f6)',
+        cat: 'Telescope — Dobsonian Reflector',
+        price: '₹45,000 – ₹58,000',
+        verdict: "At this budget, with dark sky access and a car, the 8\" Dob is the overwhelming recommendation of experienced visual astronomers. 200mm of aperture gathers a massive amount of light. The Orion Nebula becomes a structured, glowing cloud. Globular clusters resolve into individual stars. Galaxies show hints of shape. Bring this to a star party and watch the queue form.",
+        pros: ['Exceptional aperture for the price', 'Superb deep-sky and planetary performance', 'Simple and robust — almost no learning curve', 'The global standard recommendation at this budget'],
+        cons: ['Bulky — tube is about 1.2m long, needs a car', 'Not for public transport or small flats', 'Needs occasional collimation']
+      },
+      {
+        tag: 'Compact Alternative', tagClass: 'tag-alt', cardClass: '',
+        name: 'Sky-Watcher Mak 127',
+        cat: 'Telescope — Mak-Cassegrain',
+        price: '₹35,000 – ₹48,000',
+        verdict: "If portability or storage is a concern, the Mak 127 is a brilliant planet-killer in a package smaller than a shoebox. You trade deep-sky aperture for an instrument that will actually get used regularly.",
+        pros: ['Extremely compact and portable', 'Outstanding planetary views', 'Low maintenance, sealed optics'],
+        cons: ['Significantly less aperture than 8" Dob', 'Not suited to deep-sky observing', 'Long cool-down time']
+      }
+    ];
+  }
+
+  // ── ₹60,000 – ₹1,00,000 ───────────────────────
+  if (a.budget === '60to100k') {
+
+    if (wantsGoTo) {
+      return [
+        {
+          tag: 'GoTo — Our Top Pick', tagClass: 'tag-goto', cardClass: 'is-goto',
+          goto_note: "GoTo mounts contain motors and electronics, making them noticeably heavier than equivalent manual mounts — factor this into your transport plans. More importantly, they require continuous power. Batteries run down, and mains electricity is simply unavailable at remote dark sky sites. Most GoTo observers carry a dedicated astronomy power tank or compact UPS — add that to your kit list and budget. At a dark site, a manual Dobsonian will always be ready; a GoTo scope needs its power problem solved first.",
+          name: 'Celestron NexStar 5SE',
+          cat: 'Telescope — GoTo Schmidt-Cassegrain',
+          price: '₹72,000 – ₹92,000',
+          verdict: "A classic and proven instrument. The NexStar 5SE is a 125mm SCT on a reliable GoTo single-arm mount — excellent planetary views, a large object database, and rock-solid tracking. Good resale value. Strong worldwide community support and a vast accessory ecosystem. If you want a GoTo scope that simply works, this is the benchmark at this budget.",
+          pros: ['Proven, well-supported GoTo system', '125mm aperture — excellent planets and bright deep-sky', 'Strong global community and accessory support', 'Tracks objects smoothly for long visual sessions'],
+          cons: ['Needs a mains supply or large power tank for long sessions', 'Alignment required each session (15–20 min)', 'Expensive per mm of aperture versus a Dob', 'More complex if optics ever need servicing']
+        },
+        {
+          tag: 'App-Controlled Alternative', tagClass: 'tag-alt', cardClass: '',
+          name: 'Sky-Watcher AZ-GTi + Mak 127',
+          cat: 'Telescope — WiFi GoTo Mak-Cassegrain',
+          price: '₹65,000 – ₹82,000',
+          verdict: "A superb combination for city observers. The Mak 127 is one of the finest planetary instruments at this aperture size, and the AZ-GTi mount is WiFi-controlled from your smartphone. Lighter, more portable, and more affordable than the NexStar 5SE.",
+          pros: ['WiFi-controlled from smartphone — no handset needed', 'Mak 127 is outstanding on planets and double stars', 'Compact and portable', 'Mount upgradeable with other OTAs later'],
+          cons: ['Smaller aperture than NexStar 5SE', 'App dependent — needs phone battery', 'Less polished overall experience than Celestron']
+        }
+      ];
+    }
+
+    // Manual — compact
+    if (isCompact) {
+      return [
+        {
+          tag: 'Our Recommendation', tagClass: 'tag-top', cardClass: 'is-primary',
+          name: 'Sky-Watcher Mak 127 on AZ5 Deluxe Mount',
+          cat: 'Telescope — Mak-Cassegrain on Manual Alt-Az',
+          price: '₹45,000 – ₹60,000',
+          verdict: "The Mak 127 on a quality manual alt-az mount is a superb, compact planetary system. Crisp, high-contrast views of the Moon, planets, and double stars — from a balcony, a terrace, or anywhere you can carry a shoulder bag. With the remaining budget, invest in quality eyepieces.",
+          pros: ['Outstanding planetary and double-star views', 'Compact — fits in a shoulder bag', 'No batteries, no alignment, just point and look', 'Budget left over for quality eyepieces'],
+          cons: ['45–60 minute cool-down required', 'Manual tracking — objects drift slowly through field', 'Not suited to deep-sky observing']
+        },
+        {
+          tag: 'If You Reconsider GoTo', tagClass: 'tag-alt', cardClass: '',
+          name: 'Sky-Watcher AZ-GTi + Mak 127',
+          cat: 'Telescope — WiFi GoTo Mak-Cassegrain',
+          price: '₹65,000 – ₹82,000',
+          verdict: "If you find yourself reconsidering automation at this budget — the AZ-GTi and Mak 127 combination is an excellent compact GoTo system. Worth knowing about.",
+          pros: ['Automated finding and tracking', 'Still very compact', 'Mak 127 optics are excellent'],
+          cons: ['Costs more than the manual option', 'Needs phone and power']
+        }
+      ];
+    }
+
+    // Manual — dark skies + transport
+    return [
+      {
+        tag: 'King of This Budget', tagClass: 'tag-top', cardClass: 'is-primary',
+        name: 'Sky-Watcher 10" Dobsonian (254mm / f4.7)',
+        cat: 'Telescope — Dobsonian Reflector',
+        price: '₹80,000 – ₹1,00,000',
+        verdict: "Ten inches of aperture is transformative. You are now in the territory where galaxies hint at spiral structure under dark skies, globular clusters are jaw-dropping explosions of stars, and planetary detail is stunning. Many experienced visual astronomers never feel the need to go beyond this. A 10\" Dob is a serious, lifetime visual instrument.",
+        pros: ['Extraordinary light-gathering power', 'Unmatched value per rupee of aperture', 'Magnificent deep-sky and planetary views', 'Mechanically simple and very robust'],
+        cons: ['Large and heavy — two pieces, around 25 kg total', 'Definitely needs a car (ideally an SUV)', 'Takes 30–45 minutes to cool to ambient temperature', 'Needs quality eyepieces to fulfil its potential']
+      },
+      {
+        tag: 'Smart Alternative', tagClass: 'tag-alt', cardClass: '',
+        name: 'Sky-Watcher 8" Dob + Quality Eyepiece Set',
+        cat: 'Telescope + Eyepieces',
+        price: '₹45,000–58,000 + accessories',
+        verdict: "At this budget tier, an 8\" Dob leaves ₹20,000–30,000 for quality eyepieces. A well-equipped 8\" Dob outperforms a poorly equipped 10\" every single time.",
+        pros: ['Lighter and more manageable than 10"', 'Budget remaining for excellent accessories', 'Easier to transport and set up regularly'],
+        cons: ['Less raw light grasp than a 10"', 'Deep-sky objects are somewhat dimmer']
+      }
+    ];
+  }
+
+  // ── Over ₹1,00,000 ─────────────────────────────
+  if (a.budget === 'over100k') {
+
+    if (wantsGoTo) {
+      return [
+        {
+          tag: 'GoTo Flagship', tagClass: 'tag-goto', cardClass: 'is-goto',
+          goto_note: "GoTo mounts contain motors and electronics, making them noticeably heavier than equivalent manual mounts — factor this into your transport plans. More importantly, they require continuous power. Batteries run down, and mains electricity is simply unavailable at remote dark sky sites. Most GoTo observers carry a dedicated astronomy power tank or compact UPS — add that to your kit list and budget. At a dark site, a manual Dobsonian will always be ready; a GoTo scope needs its power problem solved first.",
+          name: 'Celestron NexStar 8SE',
+          cat: 'Telescope — GoTo 8" Schmidt-Cassegrain',
+          price: '₹1,20,000 – ₹1,50,000',
+          verdict: "The 8SE is a serious instrument. 203mm of SCT aperture on a proven GoTo mount — excellent planetary views with high resolution, and capable of pulling in a wide range of deep-sky objects. Compact for its aperture (an 8\" SCT is far smaller than an 8\" Dob). The benchmark GoTo visual telescope at this budget.",
+          pros: ['203mm aperture — serious light-gathering', 'Full GoTo and object tracking', 'Compact for the aperture size', 'Strong accessory and upgrade ecosystem'],
+          cons: ['Expensive per mm of aperture versus a Dob', 'Needs a mains supply or large power tank', 'Alignment required each session', 'Optical servicing more complex than a Dob']
+        },
+        {
+          tag: 'Future-Proof Alternative', tagClass: 'tag-alt', cardClass: '',
+          name: 'Sky-Watcher HEQ5 Pro GoTo + Quality OTA',
+          cat: 'Equatorial GoTo Mount + Optical Tube',
+          price: '₹1,00,000 – ₹1,40,000',
+          verdict: "The HEQ5 Pro is a highly regarded equatorial GoTo mount — and unlike alt-az GoTo systems, it also opens the door to astrophotography later if your interests evolve. Pair it with a quality OTA of your choice. A more future-proof investment for someone who may want to do more than visual astronomy eventually.",
+          pros: ['Equatorial mount — better tracking than alt-az GoTo', 'AP-ready if interests evolve later', 'Flexible — can accept various OTAs', 'Highly regarded, globally supported mount'],
+          cons: ['More complex to set up (polar alignment needed)', 'Heavier system overall', 'Requires a reliable power source']
+        }
+      ];
+    }
+
+    // Manual — compact constraint
+    if (isCompact) {
+      return [
+        {
+          tag: 'Best Compact Option', tagClass: 'tag-top', cardClass: 'is-primary',
+          name: 'Celestron NexStar 8SE',
+          cat: 'Telescope — GoTo 8" SCT',
+          price: '₹1,20,000 – ₹1,50,000',
+          verdict: "At this budget with compact constraints, the 8SE is frankly hard to avoid — even for those who prefer manual navigation. It gives you 203mm of aperture in a manageable tube. The GoTo system doesn't have to be used, but at this level it becomes genuinely useful even for experienced observers. Worth reconsidering automation at this budget.",
+          pros: ['Best aperture-to-size ratio available in this range', 'GoTo genuinely earns its place at this level', 'Strong resale value', 'Large accessory ecosystem'],
+          cons: ['Needs power supply for long sessions', 'Alignment required each session', 'Expensive per mm versus a Dobsonian']
+        }
+      ];
+    }
+
+    // Manual — dark skies + transport
+    return [
+      {
+        tag: 'The Visual Flagship', tagClass: 'tag-top', cardClass: 'is-primary',
+        name: 'Sky-Watcher 12" Dobsonian (300mm / f5)',
+        cat: 'Telescope — Dobsonian Reflector',
+        price: '₹1,20,000 – ₹1,60,000',
+        verdict: "This is where visual astronomy becomes a profound experience. Under dark Coorg skies, a 12\" Dob will show you structure in galaxies, colour in nebulae, and a Moon so detailed it looks geological. The Orion Nebula becomes three-dimensional. Globular clusters resolve to the very core. This is the largest practical Dobsonian for most observers — and the sweet spot of serious visual astronomy.",
+        pros: ['Exceptional light-gathering — transformative views', 'The pinnacle of practical visual astronomy', 'Magnificent at dark sky star parties', 'Strong resale value'],
+        cons: ['Large and heavy — best moved by two people', 'Needs an SUV or large car boot', 'Significant cool-down time (45–60 minutes)', 'Quality eyepieces needed — budget ₹20,000–30,000 extra']
+      },
+      {
+        tag: 'Also Consider', tagClass: 'tag-alt', cardClass: '',
+        name: 'Sky-Watcher 10" Dob + Premium Eyepiece Set',
+        cat: 'Telescope + Accessories',
+        price: '₹80,000–1,00,000 + eyepieces',
+        verdict: "A 10\" Dob with a premium eyepiece set can outperform a 12\" with mediocre eyepieces. If you're new to large-aperture telescopes, this is a sensible stepping stone — with real budget left for the accessories that unlock the telescope's full potential.",
+        pros: ['More manageable than 12"', 'Budget for quality eyepieces and accessories', 'Still delivers extraordinary views'],
+        cons: ['Less aperture than the 12"', 'Deep-sky objects are somewhat dimmer']
+      }
+    ];
+  }
+
+  return [];
+}
+
+
+/* ══════════════════════════════════════════════════
+   QUIZ ENGINE
+   ══════════════════════════════════════════════════ */
+let answers = {};
+let flow    = [];
+let flowIdx = 0;
+
+function startQuiz() {
+  answers = {};
+  flow    = getFlow(answers);
+  flowIdx = 0;
+  document.getElementById('quiz-section').style.display   = 'block';
+  document.getElementById('result-section').style.display = 'none';
+  document.getElementById('result-section').innerHTML     = '';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  flow = getFlow(answers);
+  const qId = flow[flowIdx];
+  const q   = { ...ALL_QUESTIONS[qId] };
+
+  // Personalise age question for 'myself'
+  if (qId === 'age' && answers.who === 'myself') {
+    q.text = 'How old are you?';
+    q.hint = 'This affects which equipment is comfortable and practical for you.';
+  }
+
+  const total = flow.length;
+  const pct   = Math.round((flowIdx / total) * 100);
+
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('q-label').textContent       = `Question ${flowIdx + 1}`;
+  document.getElementById('q-of').textContent          = `of ${total}`;
+
+  const calloutHtml = q.callout
+    ? `<div class="q-callout">${q.callout}</div>`
+    : '';
+
+  const prevAnswer = answers[qId];
+  const optionsHtml = q.options.map(o => {
+    const isSelected = prevAnswer === o.v;
+    return `
+    <button class="opt-btn ${o.cls || ''}${isSelected ? ' opt-selected' : ''}" onclick="pick('${qId}','${o.v}')">
+      <span class="opt-icon">${o.icon}</span>
+      <span>
+        <span class="opt-label">${o.label}</span>
+        <span class="opt-desc">${o.desc}</span>
+      </span>
+      ${isSelected ? '<span class="opt-check">✓</span>' : ''}
+    </button>
+  `}).join('');
+
+  document.getElementById('question-container').innerHTML = `
+    <div class="q-card">
+      <div class="q-eyebrow">Question ${flowIdx + 1} of ${total}</div>
+      <div class="q-text">${q.text}</div>
+      <div class="q-hint">${q.hint}</div>
+      ${calloutHtml}
+      <div class="options">${optionsHtml}</div>
+      <div class="nav-row">
+        ${flowIdx > 0 ? '<button class="btn-back" onclick="goBack()">← Back</button>' : ''}
+      </div>
+    </div>
+  `;
+}
+
+function pick(qId, value) {
+  answers[qId] = value;
+  flow = getFlow(answers);
+  flowIdx++;
+  if (flowIdx >= flow.length) {
+    showResults();
+  } else {
+    renderQuestion();
+  }
+}
+
+function goBack() {
+  if (flowIdx > 0) {
+    flowIdx--;
+    flow = getFlow(answers);
+    renderQuestion();
+  }
+}
+
+function showResults() {
+  document.getElementById('quiz-section').style.display = 'none';
+
+  const recs = getRecommendations(answers);
+
+  const cardsHtml = recs.map(r => `
+    <div class="reco-card ${r.cardClass || ''}">
+      <div class="reco-tag ${r.tagClass}">${r.tag}</div>
+      <div class="reco-name">${r.name}</div>
+      <div class="reco-cat">${r.cat}</div>
+      ${r.price ? `<div class="reco-price">Approx. ${r.price}</div>` : ''}
+      <div class="reco-verdict">${r.verdict}</div>
+      ${r.note      ? `<div class="reco-note"><strong>📐 Tripod note:</strong> ${r.note}</div>` : ''}
+      ${r.goto_note ? `<div class="reco-note-goto"><strong>⚡ GoTo &amp; power note:</strong> ${r.goto_note}</div>` : ''}
+      <div class="pros-cons" style="padding-top:1.25rem; border-top:1px solid var(--card-border);">
+        <div class="pros">
+          <h4>Strengths</h4>
+          <ul>${r.pros.map(p => `<li>${p}</li>`).join('')}</ul>
+        </div>
+        <div class="cons">
+          <h4>Limitations</h4>
+          <ul>${r.cons.map(c => `<li>${c}</li>`).join('')}</ul>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('result-section').innerHTML = `
+    <div class="result-header">
+      <h2>Here's What We Recommend</h2>
+      <p>Based on your answers — with honest trade-offs. No sales pitch.</p>
+    </div>
+    <div class="reco-cards">${cardsHtml}</div>
+    <div class="retailers-box">
+      <strong>📍 Retailers in India</strong><br>
+      <em style="font-size:0.82rem;">JustAstronomy is not affiliated to any retailer, nor do we endorse any. Listed here for your convenience only.</em>
+      <ul style="margin:0.75rem 0 0 1.1rem; padding:0; line-height:1.9;">
+        <li><a href="https://moderntelescopes.net/" target="_blank" style="color:var(--accent2);">Modern Telescopes</a></li>
+        <li><a href="https://www.thetelescopefactory.in/" target="_blank" style="color:var(--accent2);">The Telescope Factory</a></li>
+        <li><a href="https://spacearcade.in/" target="_blank" style="color:var(--accent2);">Space Arcade</a></li>
+      </ul><br>
+      <strong>💬 Still not sure?</strong> Drop a question on the <a href="https://www.reddit.com/r/telescopes/" target="_blank" style="color:var(--accent2);">r/telescopes</a> or <a href="https://www.reddit.com/r/AskAstrophotography/" target="_blank" style="color:var(--accent2);">r/AskAstrophotography</a> communities — experienced amateurs are always happy to help.
+    </div>
+    <div class="share-row">
+      <button class="btn-share btn-share-pdf" onclick="printResult()">📄 Download / Print as PDF</button>
+      <button class="btn-share btn-share-native" id="btn-share-native" style="display:none" onclick="shareResult()">📤 Share</button>
+    </div>
+    <div class="restart-row">
+      <button class="btn-restart" onclick="startQuiz()">↺ Start Over</button>
+    </div>
+  `;
+
+  document.getElementById('result-section').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  initShareButton();
+}
+
+
+/* ══════════════════════════════════════════════════
+   SHARE & PRINT
+   ══════════════════════════════════════════════════ */
+
+// Map answer values → readable labels for the summary
+function answerLabel(qId, val) {
+  const q = ALL_QUESTIONS[qId];
+  if (!q) return val;
+  const opt = q.options.find(o => o.v === val);
+  return opt ? opt.label : val;
+}
+
+// Human-readable question short names for the summary
+const Q_NAMES = {
+  who: 'Buying for',
+  age: 'Age group',
+  experience: 'Experience level',
+  budget: 'Budget',
+  location: 'Observing location',
+  transport: 'Transport',
+  storage: 'Storage space',
+  goto_pref: 'Navigation style',
+  interest: 'Primary interest'
+};
+
+function buildPrintSummary() {
+  const flowNow = getFlow(answers);
+  const rows = flowNow.map(qId => {
+    const val = answers[qId];
+    if (!val) return '';
+    return `<tr>
+      <td style="padding:4px 16px 4px 0;color:#555;font-size:0.85rem;white-space:nowrap;vertical-align:top;">${Q_NAMES[qId] || qId}</td>
+      <td style="padding:4px 0;font-size:0.85rem;color:#111;font-weight:500;">${answerLabel(qId, val)}</td>
+    </tr>`;
+  }).join('');
+  return `<div id="print-summary" style="display:none;margin-bottom:1.5rem;"><p style="font-size:0.7rem;letter-spacing:1.5px;text-transform:uppercase;color:#888;margin-bottom:0.3rem;">JustAstronomy — Equipment Buying Guide</p><div style="padding:1rem 1.25rem;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:8px;">
+    <div style="font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:#888;font-weight:700;margin-bottom:0.6rem;">Your Selections</div>
+    <table style="border-collapse:collapse;">${rows}</table>
+  </div></div>`;
+}
+
+function buildShareText() {
+  const flowNow = getFlow(answers);
+  const lines = flowNow.map(qId => {
+    const val = answers[qId];
+    if (!val) return null;
+    return `${Q_NAMES[qId] || qId}: ${answerLabel(qId, val)}`;
+  }).filter(Boolean);
+
+  const recs = getRecommendations(answers);
+  const recLines = recs.map((r, i) =>
+    `${i + 1}. ${r.name} (${r.cat})${r.price ? ' — ' + r.price : ''}`
+  );
+
+  return [
+    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+    'JUSTASTRONOMY',
+    'Equipment Buying Guide · justastronomy.github.io',
+    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+    '',
+    'MY SELECTIONS',
+    ...lines.map(l => '• ' + l),
+    '',
+    'RECOMMENDATIONS',
+    ...recLines,
+    '',
+    'Generated by the JustAstronomy Equipment Guide · justastronomy.github.io · No affiliates. No sales pitch. No spin.'
+  ].join('\n');
+}
+
+function printResult() {
+  // Inject print summary if not already there
+  const existing = document.getElementById('print-summary');
+  if (!existing) {
+    const summaryHtml = buildPrintSummary();
+    const resultHeader = document.querySelector('.result-header');
+    if (resultHeader) {
+      resultHeader.insertAdjacentHTML('afterend', summaryHtml);
+    }
+  }
+  window.print();
+}
+
+async function shareResult() {
+  if (!navigator.share) return;
+  try {
+    await navigator.share({
+      title: 'JustAstronomy Equipment Buying Guide',
+      text: buildShareText(),
+      url: 'https://justastronomy.github.io/beginners.html'
+    });
+  } catch (e) {
+    // User cancelled or error — do nothing
+  }
+}
+
+// Show native share button only on supporting devices
+function initShareButton() {
+  const btn = document.getElementById('btn-share-native');
+  if (btn && navigator.share) btn.style.display = 'flex';
+}
+
+// Boot
+startQuiz();
+initShareButton();
+</script>
+</body>
+</html>
