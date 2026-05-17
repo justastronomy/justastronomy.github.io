@@ -144,21 +144,29 @@
     .meta-value { font-size: 14px; color: var(--text); font-weight: 500; }
 
     /* Bortle badge */
-    .bortle-badge {
+    /* Conditions panel — sits top-right of each session header */
+    .conditions-panel {
       background: var(--surface-2);
-      border-radius: 8px; padding: 16px 20px;
-      text-align: center; min-width: 90px;
+      border-radius: 10px;
+      padding: 16px 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px 20px;
+      min-width: 180px;
+      flex-shrink: 0;
     }
 
-    .bortle-badge .num {
-      font-family: var(--font-display);
-      font-size: 40px; font-weight: 600; color: var(--accent);
-      line-height: 1; display: block;
-    }
+    .cond-item { display: flex; flex-direction: column; gap: 3px; }
 
-    .bortle-badge .lbl {
+    .cond-label {
       font-size: 9px; letter-spacing: 0.14em;
       text-transform: uppercase; color: var(--text-muted);
+    }
+
+    .cond-value {
+      font-family: var(--font-display);
+      font-size: 20px; font-weight: 600;
+      color: var(--accent); line-height: 1;
     }
 
     /* Observation entries */
@@ -285,7 +293,7 @@
         <div class="session-header">
           <div>
             <p class="session-date">Jan 16 – 20, 2026</p>
-            <h2 class="session-title">BAS Star party, Talacauvery, Coorg</h2>
+            <h2 class="session-title">Star Party, Talacauvery, Coorg</h2>
             <div class="session-meta">
               <div class="meta-item">
                 <span class="meta-label">Location</span>
@@ -297,9 +305,24 @@
               </div>
             </div>
           </div>
-          <div class="bortle-badge">
-            <span class="num">3</span>
-            <span class="lbl">Bortle</span>
+          <!-- Conditions panel: update Bortle, Seeing, Transparency, Duration for each session -->
+          <div class="conditions-panel">
+            <div class="cond-item">
+              <span class="cond-label">Bortle</span>
+              <span class="cond-value">3</span>
+            </div>
+            <div class="cond-item">
+              <span class="cond-label">Seeing</span>
+              <span class="cond-value">3–4/5</span>
+            </div>
+            <div class="cond-item">
+              <span class="cond-label">Transp.</span>
+              <span class="cond-value">3/5</span>
+            </div>
+            <div class="cond-item">
+              <span class="cond-label">Duration</span>
+              <span class="cond-value">7 hrs</span>
+            </div>
           </div>
         </div>
 
@@ -657,10 +680,10 @@
         <!-- <strong>Next session goes here</strong> -->
         <!-- After your next night out, copy the session block above, paste it here, -->
         <!-- and fill in your new observations. -->
-      <!-- </div> -->
-
-      <!-- NEW TEST SESSION START -->
-      <!-- ===================== -->
+      <!-- =====================
+           SESSION — Feb 2026, Bangalore
+           Newest sessions go at the top, above the previous one.
+      ===================== -->
       <div class="session">
 
         <div class="session-header">
@@ -678,9 +701,24 @@
               </div>
             </div>
           </div>
-          <div class="bortle-badge">
-            <span class="num">5</span>
-            <span class="lbl">Bortle</span>
+          <!-- Conditions panel: update Bortle, Seeing, Transparency, Duration for each session -->
+          <div class="conditions-panel">
+            <div class="cond-item">
+              <span class="cond-label">Bortle</span>
+              <span class="cond-value">5</span>
+            </div>
+            <div class="cond-item">
+              <span class="cond-label">Seeing</span>
+              <span class="cond-value">—/5</span>
+            </div>
+            <div class="cond-item">
+              <span class="cond-label">Transp.</span>
+              <span class="cond-value">—/5</span>
+            </div>
+            <div class="cond-item">
+              <span class="cond-label">Duration</span>
+              <span class="cond-value">— hrs</span>
+            </div>
           </div>
         </div>
 
