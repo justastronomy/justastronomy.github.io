@@ -229,10 +229,6 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 36px;
-      display: grid;
-      grid-template-columns: 1fr 180px;
-      gap: 32px;
-      align-items: start;
       transition: border-color 0.25s;
     }
     .log-card:hover { border-color: rgba(201,147,58,0.5); }
@@ -276,30 +272,7 @@
       padding: 4px 10px;
     }
 
-    /* Right-side conditions panel inside the log card */
-    .log-conditions {
-      background: var(--surface-2);
-      border-radius: 8px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .condition-item { display: flex; flex-direction: column; gap: 2px; }
-
-    .condition-label {
-      font-size: 10px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-    }
-
-    .condition-value {
-      font-size: 15px;
-      font-weight: 500;
-      color: var(--text);
-    }
+    /* Conditions detail moved to log.html — one place to maintain */
 
     /* =====================
        TOPIC CARDS (3-up grid)
@@ -484,14 +457,11 @@
   </header>
 
   <!-- =====================
-       LATEST LOG ENTRY — always shows your MOST RECENT session.
-       Each time you add a new session to log.html, update these 5 things here:
-         1. log-date       → date of the new session
-         2. log-title      → short title for it
-         3. log-body       → 2-3 sentences on what you saw
-         4. condition-value fields (Seeing, Transparency, Bortle, Duration)
-         5. log-tags       → update if location or object type changes
-       Everything else on this page stays the same.
+       LATEST LOG ENTRY — update these 3 things each time you add a new session to log.html:
+         1. log-date  → date of the new session  (e.g. "14 May 2026")
+         2. log-title → short title              (e.g. "Coorg Star Party")
+         3. log-body  → 2-3 sentences on what you saw
+       Conditions detail (Bortle, Seeing etc.) lives in log.html now — no need to repeat it here.
   ===================== -->
   <section>
     <div class="container">
@@ -503,7 +473,7 @@
 
           <div>
             <p class="log-date">January 16th to 20th 2026</p>
-            <h3 class="log-title">BAS Star Party near Talacauvery, Coorg, India</h3>
+            <h3 class="log-title">Star Party, Talacauvery, Coorg</h3>
             <p class="log-body">
               A rewarding night under the pristine skies of Coorg. Some highlights included NGC1999, M53, M104 and M51
             </p>
@@ -513,26 +483,6 @@
               <span class="tag">Coorg</span>
             </div>
           </div>
-
-          <!-- Sky conditions panel — fill in after each session -->
-          <aside class="log-conditions">
-            <div class="condition-item">
-              <span class="condition-label">Seeing</span>
-              <span class="condition-value">3 - 4 / 5</span>
-            </div>
-            <div class="condition-item">
-              <span class="condition-label">Transparency</span>
-              <span class="condition-value">3 / 5</span>
-            </div>
-            <div class="condition-item">
-              <span class="condition-label">Bortle</span>
-              <span class="condition-value">3</span>
-            </div>
-            <div class="condition-item">
-              <span class="condition-label">Duration</span>
-              <span class="condition-value">7 hrs</span>
-            </div>
-          </aside>
 
         </article>
       </a>
