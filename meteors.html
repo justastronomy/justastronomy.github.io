@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meteor Showers — JustAstronomy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #080c16; --surface: #0e1628; --surface-2: #141e35;
+      --accent: #c9933a; --text: #e8e4d9; --text-muted: #8a93a8;
+      --border: rgba(255,255,255,0.07);
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-body: 'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-body);
+            font-size: 16px; line-height: 1.7; min-height: 100vh; overflow-x: hidden; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    
+    #stars {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0; pointer-events: none;
+    }
+
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(8,12,22,0.92); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 24px; max-width: 900px; margin: 0 auto;
+    }
+    .nav-logo { font-family: var(--font-display); font-size: 22px; color: var(--text); }
+    .nav-logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a {
+      color: var(--text-muted); font-size: 13px; font-weight: 500;
+      letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.2s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--accent); text-decoration: none; }
+    .page-wrap {
+      position: relative; z-index: 1;
+      max-width: 900px; margin: 0 auto; padding: 72px 24px 0;
+    }
+    .page-eyebrow {
+      font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--accent); font-weight: 500; margin-bottom: 12px;
+    }
+    .page-wrap h1 {
+      font-family: var(--font-display);
+      font-size: clamp(36px, 6vw, 60px);
+      font-weight: 600; line-height: 1.08; margin-bottom: 16px;
+    }
+    .page-wrap .lead {
+      color: var(--text-muted); font-size: 16px; max-width: 520px;
+      line-height: 1.75; margin-bottom: 64px;
+    }
+    /* Construction card */
+    .construction-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 56px 36px 48px;
+      text-align: center;
+      max-width: 560px;
+      margin: 0 auto 80px;
+    }
+    .construction-card .svg-wrap {
+      margin-bottom: 32px;
+    }
+    .construction-card h2 {
+      font-family: var(--font-display);
+      font-size: 28px; font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .construction-card p {
+      color: var(--text-muted); font-size: 15px;
+      line-height: 1.75; max-width: 380px; margin: 0 auto 24px;
+    }
+    .notify-link {
+      font-size: 13px; color: var(--text-muted); letter-spacing: 0.04em;
+    }
+    .notify-link a { color: var(--accent); }
+    .site-footer {
+      border-top: 1px solid var(--border); padding: 40px 0;
+      position: relative; z-index: 1;
+    }
+    .footer-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      max-width: 900px; margin: 0 auto; padding: 0 24px;
+    }
+    .footer-brand { font-family: var(--font-display); font-size: 18px; color: var(--text-muted); }
+    .footer-brand span { color: var(--accent); }
+    .footer-right { font-size: 13px; color: var(--text-muted); }
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .footer-inner { flex-direction: column; gap: 12px; text-align: center; }
+      .construction-card { padding: 40px 24px; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="stars"></canvas>
+  <nav>
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">Just<span>Astronomy</span></a>
+      <ul class="nav-links">
+        <li><a href="log.html">Log</a></li>
+        <li><a href="dso.html">Deep Sky</a></li>
+        <li><a href="meteors.html" class="active">Meteors</a></li>
+        <li><a href="equipment.html">Equipment</a></li>
+        <li><a href="beginners.html">New Here?</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </div>
+  </nav>
+  <div class="page-wrap">
+    <p class="page-eyebrow">Annual events</p>
+    <h1>Meteor Showers</h1>
+    <p class="lead">A yearly calendar of major showers — Perseids, Leonids, Geminids and more — with peak dates, radiant positions, and personal session notes.</p>
+
+    <div class="construction-card">
+      <div class="svg-wrap">
+        <svg viewBox="0 0 360 268" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:340px;display:block;margin:0 auto;">
+  <!-- Scattered stars -->
+  <circle cx="32"  cy="28"  r="1.5" fill="#e8e4d9" opacity="0.6"/>
+  <circle cx="310" cy="18"  r="1.2" fill="#e8e4d9" opacity="0.5"/>
+  <circle cx="50"  cy="100" r="1"   fill="#e8e4d9" opacity="0.4"/>
+  <circle cx="340" cy="90"  r="1.5" fill="#e8e4d9" opacity="0.7"/>
+  <circle cx="18"  cy="180" r="1"   fill="#e8e4d9" opacity="0.4"/>
+  <circle cx="330" cy="160" r="1.2" fill="#e8e4d9" opacity="0.5"/>
+  <!-- Sparkle at top -->
+  <g opacity="0.7" transform="translate(272,32)">
+    <line x1="0" y1="-7" x2="0" y2="7"   stroke="#c9933a" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="-7" y1="0" x2="7" y2="0"   stroke="#c9933a" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="-5" y1="-5" x2="5" y2="5"  stroke="#c9933a" stroke-width="0.7" stroke-linecap="round"/>
+    <line x1="5" y1="-5" x2="-5" y2="5"  stroke="#c9933a" stroke-width="0.7" stroke-linecap="round"/>
+  </g>
+  <!-- Moon crescent upper right -->
+  <circle cx="302" cy="54" r="30" fill="#c9933a" opacity="0.12"/>
+  <circle cx="302" cy="54" r="28" fill="none" stroke="#c9933a" stroke-width="1" opacity="0.35"/>
+  <circle cx="316" cy="47" r="23" fill="#080c16"/>
+  <!-- Tripod legs -->
+  <line x1="162" y1="165" x2="96"  y2="245" stroke="#8a93a8" stroke-width="3"   stroke-linecap="round"/>
+  <line x1="162" y1="165" x2="228" y2="245" stroke="#8a93a8" stroke-width="3"   stroke-linecap="round"/>
+  <line x1="162" y1="165" x2="162" y2="248" stroke="#8a93a8" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="118" y1="214" x2="206" y2="214" stroke="#8a93a8" stroke-width="1.8" opacity="0.5"/>
+  <!-- Telescope tube -->
+  <line x1="162" y1="165" x2="264" y2="55" stroke="#c9933a" stroke-width="17" stroke-linecap="round" opacity="0.92"/>
+  <!-- Band detail -->
+  <line x1="194" y1="132" x2="222" y2="102" stroke="#080c16" stroke-width="3" opacity="0.45"/>
+  <!-- Eyepiece end -->
+  <circle cx="162" cy="165" r="12" fill="#0e1628" stroke="#c9933a" stroke-width="2.5"/>
+  <circle cx="162" cy="165" r="5"  fill="#141e35"/>
+  <!-- Objective end -->
+  <circle cx="264" cy="55"  r="10" fill="#0e1628" stroke="#8a93a8" stroke-width="2"/>
+  <circle cx="264" cy="55"  r="4"  fill="#141e35"/>
+  <!-- Hanging sign string -->
+  <line x1="212" y1="110" x2="212" y2="130" stroke="#8a93a8" stroke-width="1.5" opacity="0.65" stroke-dasharray="2 2"/>
+  <!-- Sign board -->
+  <rect x="164" y="130" width="96" height="52" rx="7" fill="#0e1628" stroke="#c9933a" stroke-width="1.8"/>
+  <text x="212" y="151" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9.5" fill="#c9933a" font-weight="600" letter-spacing="1.5">UNDER</text>
+  <text x="212" y="167" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9.5" fill="#c9933a" font-weight="600" letter-spacing="1.5">CONSTRUCTION</text>
+  <text x="212" y="176" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="7"   fill="#8a93a8" letter-spacing="0.5">come back soon</text>
+  <!-- Astronomer figure (seated, looking through eyepiece) -->
+  <!-- Body -->
+  <ellipse cx="136" cy="200" rx="12" ry="16" fill="#0e1628" stroke="#8a93a8" stroke-width="1.5"/>
+  <!-- Head -->
+  <circle cx="136" cy="176" r="13"  fill="#0e1628" stroke="#8a93a8" stroke-width="1.5"/>
+  <!-- Helmet visor -->
+  <ellipse cx="139" cy="176" rx="7" ry="9" fill="#c9933a" opacity="0.18"/>
+  <!-- Eyes, looking right toward eyepiece -->
+  <circle cx="134" cy="174" r="1.8" fill="#8a93a8"/>
+  <circle cx="140" cy="174" r="1.8" fill="#8a93a8"/>
+  <circle cx="141" cy="174" r="0.9" fill="#e8e4d9"/>
+  <!-- Arm reaching to eyepiece -->
+  <path d="M148 188 Q158 178 162 172" fill="none" stroke="#8a93a8" stroke-width="2.2" stroke-linecap="round"/>
+  <!-- Legs (seated cross-legged) -->
+  <path d="M126 214 Q116 224 110 230" fill="none" stroke="#8a93a8" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M146 214 Q152 224 148 232" fill="none" stroke="#8a93a8" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Ground line -->
+  <line x1="60" y1="248" x2="300" y2="248" stroke="#8a93a8" stroke-width="1" opacity="0.2"/>
+</svg>
+      </div>
+      <h2>Content coming soon</h2>
+      <p>This page is being put together. Check back after the next clear night.</p>
+      <p class="notify-link">In the meantime, head to the <a href="log.html">Observation Log</a> or find your first scope on the <a href="beginners.html">New Here?</a> page.</p>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-brand">Just<span>Astronomy</span></span>
+      <span class="footer-right">Bengaluru, India &nbsp;·&nbsp; Clear skies 🌠</span>
+    </div>
+  </footer>
+
+  <script>
+  /* ── Star field ───────────────────────────────────── */
+(function () {
+  const cv = document.getElementById('stars');
+  const cx = cv.getContext('2d');
+  let stars = [];
+  function resize() { cv.width = window.innerWidth; cv.height = window.innerHeight; }
+  function seed() {
+    stars = [];
+    for (let i = 0; i < 200; i++) stars.push({
+      x: Math.random() * cv.width, y: Math.random() * cv.height,
+      r: Math.random() * 1.3 + 0.2,
+      a: Math.random() * 0.65 + 0.2,
+      spd: Math.random() * 0.004 + 0.001,
+      dir: Math.random() > 0.5 ? 1 : -1
+    });
+  }
+  function draw() {
+    cx.clearRect(0, 0, cv.width, cv.height);
+    stars.forEach(s => {
+      s.a += s.spd * s.dir;
+      if (s.a > 0.88 || s.a < 0.1) s.dir *= -1;
+      cx.beginPath(); cx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      cx.fillStyle = `rgba(190,215,255,${s.a})`; cx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  resize(); seed(); draw();
+  window.addEventListener('resize', () => { resize(); seed(); });
+})()
+  </script>
+</body>
+</html>
