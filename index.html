@@ -28,13 +28,6 @@
       --font-body:    'DM Sans', sans-serif;
     }
 
-    /* Star canvas — fixed behind everything, z-index 0 */
-    #stars {
-      position: fixed; top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: 0; pointer-events: none;
-    }
-
     /* =====================
        RESET & BASE
     ===================== */
@@ -48,6 +41,20 @@
       font-size: 16px;
       line-height: 1.7;
       min-height: 100vh;
+      /* CSS-only star field — scattered dots via radial gradients */
+      background-image:
+        radial-gradient(1px 1px at 15% 22%, rgba(255,255,255,0.65) 0%, transparent 100%),
+        radial-gradient(1px 1px at 72%  8%, rgba(255,255,255,0.5)  0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 88% 35%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 44% 15%, rgba(255,255,255,0.7)  0%, transparent 100%),
+        radial-gradient(1px 1px at  6% 60%, rgba(255,255,255,0.4)  0%, transparent 100%),
+        radial-gradient(1px 1px at 93% 72%, rgba(255,255,255,0.5)  0%, transparent 100%),
+        radial-gradient(1px 1px at 28% 80%, rgba(255,255,255,0.35) 0%, transparent 100%),
+        radial-gradient(1px 1px at 55% 90%, rgba(255,255,255,0.4)  0%, transparent 100%),
+        radial-gradient(1px 1px at 78% 55%, rgba(255,255,255,0.6)  0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 33% 44%, rgba(255,255,255,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 62% 38%, rgba(255,255,255,0.5)  0%, transparent 100%),
+        radial-gradient(1px 1px at 19% 92%, rgba(255,255,255,0.4)  0%, transparent 100%);
       background-attachment: fixed;
     }
 
@@ -59,7 +66,6 @@
        LAYOUT
     ===================== */
     .container {
-      position: relative; z-index: 1;
       max-width: 900px;
       margin: 0 auto;
       padding: 0 24px;
@@ -268,50 +274,6 @@
     /* Conditions detail lives in log.html */
 
     /* =====================
-       TOPIC CARDS (3-up grid)
-    ===================== */
-    .cards-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
-
-    .topic-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 28px 24px;
-      transition: border-color 0.2s, transform 0.2s, background 0.2s;
-    }
-    .topic-card:hover {
-      border-color: rgba(201,147,58,0.35);
-      background: var(--surface-2);
-      transform: translateY(-3px);
-      text-decoration: none;
-    }
-
-    .card-icon {
-      font-size: 30px;
-      margin-bottom: 16px;
-      display: block;
-      line-height: 1;
-    }
-
-    .card-title {
-      font-family: var(--font-display);
-      font-size: 22px;
-      font-weight: 600;
-      margin-bottom: 10px;
-      color: var(--text);
-    }
-
-    .card-desc {
-      font-size: 14px;
-      color: var(--text-muted);
-      line-height: 1.65;
-    }
-
-    /* =====================
        BEGINNER STRIP
     ===================== */
     .beginner-strip {
@@ -398,7 +360,6 @@
 </head>
 
 <body>
-  <canvas id="stars"></canvas>
 
   <!-- =====================
        NAVIGATION
@@ -409,10 +370,10 @@
       <a href="index.html" class="nav-logo">Just<span>Astronomy</span></a>
       <ul class="nav-links">
         <li><a href="log.html">Log</a></li>
-        <li><a href="dso.html">Deep Sky</a></li>
-        <li><a href="meteors.html">Meteors</a></li>
         <li><a href="equipment.html">Equipment</a></li>
-        <li><a href="beginners.html">Beginners</a></li>
+        <li><a href="beginners.html">New Here?</a></li>
+        <li><a href="darksky.html">Dark Sky India</a></li>
+        <li><a href="events.html">Events</a></li>
         <li><a href="about.html">About</a></li>
       </ul>
     </div>
@@ -475,47 +436,7 @@
     </div>
   </section>
 
-  <!-- =====================
-       WHAT I OBSERVE — 3 topic cards
-       Each card links to a dedicated page.
-  ===================== -->
-  <section>
-    <div class="container">
-      <p class="section-label">What I observe</p>
-      <h2 class="section-title">Three things I track</h2>
 
-      <div class="cards-grid">
-
-        <a href="log.html" class="topic-card" style="color: inherit;">
-          <span class="card-icon">🔭</span>
-          <h3 class="card-title">Visual observing</h3>
-          <p class="card-desc">
-            Eyepiece sessions under dark skies — what I saw,
-            how I found it, and what surprised me.
-          </p>
-        </a>
-
-        <a href="dso.html" class="topic-card" style="color: inherit;">
-          <span class="card-icon">🌌</span>
-          <h3 class="card-title">Deep sky objects</h3>
-          <p class="card-desc">
-            Nebulae, galaxies and star clusters I've personally
-            observed, with notes on difficulty and visibility.
-          </p>
-        </a>
-
-        <a href="meteors.html" class="topic-card" style="color: inherit;">
-          <span class="card-icon">☄️</span>
-          <h3 class="card-title">Meteor showers</h3>
-          <p class="card-desc">
-            A yearly calendar of major showers with peak dates,
-            radiant positions and personal session notes.
-          </p>
-        </a>
-
-      </div>
-    </div>
-  </section>
 
   <!-- =====================
        BEGINNER'S CORNER TEASER
@@ -631,38 +552,6 @@
       if (d) d.textContent = 'See the Log page for latest session';
     }
   })();
-  </script>
-
-  <script>
-  /* ── Star field ───────────────────────────────────── */
-(function () {
-  const cv = document.getElementById('stars');
-  const cx = cv.getContext('2d');
-  let stars = [];
-  function resize() { cv.width = window.innerWidth; cv.height = window.innerHeight; }
-  function seed() {
-    stars = [];
-    for (let i = 0; i < 200; i++) stars.push({
-      x: Math.random() * cv.width, y: Math.random() * cv.height,
-      r: Math.random() * 1.3 + 0.2,
-      a: Math.random() * 0.65 + 0.2,
-      spd: Math.random() * 0.004 + 0.001,
-      dir: Math.random() > 0.5 ? 1 : -1
-    });
-  }
-  function draw() {
-    cx.clearRect(0, 0, cv.width, cv.height);
-    stars.forEach(s => {
-      s.a += s.spd * s.dir;
-      if (s.a > 0.88 || s.a < 0.1) s.dir *= -1;
-      cx.beginPath(); cx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-      cx.fillStyle = `rgba(190,215,255,${s.a})`; cx.fill();
-    });
-    requestAnimationFrame(draw);
-  }
-  resize(); seed(); draw();
-  window.addEventListener('resize', () => { resize(); seed(); });
-})()
   </script>
 </body>
 </html>

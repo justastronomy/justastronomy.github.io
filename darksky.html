@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dark Sky India — JustAstronomy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<style>
+:root {
+  --bg:       #06070d;
+  --bg2:      #0c0e1b;
+  --bg3:      #111425;
+  --gold:     #f0c855;
+  --gold-dim: rgba(240,200,85,0.35);
+  --gold-faint:rgba(240,200,85,0.09);
+  --text:     #e5ddc8;
+  --text-dim: rgba(229,221,200,0.52);
+  --border:   rgba(240,200,85,0.11);
+  --border-s: rgba(240,200,85,0.28);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'IBM Plex Mono',monospace;font-weight:300;overflow-x:hidden;}
+h1,h2,h3,h4{font-family:'Cormorant Garamond',serif;font-weight:600;}
+
+/* ── HEADER ─────────────────────────────────── */
+header{
+  position:sticky;top:0;z-index:2000;
+  background:rgba(6,7,13,0.92);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+  padding:0 52px;height:62px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.logo{display:flex;align-items:center;gap:13px;}
+.logo-star{font-size:22px;color:var(--gold);animation:twinkle 3.5s ease-in-out infinite;}
+@keyframes twinkle{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.45;transform:scale(.85);}}
+.logo-text{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:700;color:var(--gold);letter-spacing:.06em;}
+.logo-sub{font-size:9.5px;color:var(--text-dim);letter-spacing:.14em;text-transform:uppercase;margin-top:1px;}
+nav{display:flex;gap:30px;}
+nav a{color:var(--text-dim);text-decoration:none;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;transition:color .2s;}
+nav a:hover{color:var(--gold);}
+
+/* ── LAYOUT HELPERS ──────────────────────────── */
+.container{max-width:1260px;margin:0 auto;padding:0 52px;}
+
+/* ── INTRO SECTION ───────────────────────────── */
+#intro{position:relative;padding:78px 0 64px;overflow:hidden;}
+#starsBg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;}
+.intro-content{position:relative;z-index:1;}
+.intro-grid{display:grid;grid-template-columns:1fr 1.15fr;gap:72px;align-items:start;}
+.intro-left h2{font-size:40px;line-height:1.17;margin-bottom:18px;}
+.intro-left h2 em{color:var(--gold);font-style:italic;}
+.intro-left p{color:var(--text-dim);line-height:1.85;font-size:12.5px;margin-bottom:22px;text-align:justify;hyphens:auto;}
+.intro-left h3{font-size:26px;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.divider{height:1px;background:var(--border);margin:28px 0;}
+
+/* Bortle strip */
+.bortle-strip-label{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin-bottom:9px;}
+.bortle-bar{height:18px;border-radius:9px;
+  background:linear-gradient(to right,#7c3aed,#2563eb 13%,#0891b2 26%,#059669 40%,#84cc16 53%,#eab308 64%,#f97316 76%,#ef4444 88%,#be123c);}
+.bortle-nums{display:flex;justify-content:space-between;margin-top:5px;}
+.bortle-nums span{font-size:10px;color:var(--text-dim);flex:1;text-align:center;}
+.bortle-desc-row{display:flex;justify-content:space-between;margin-top:3px;}
+.bortle-desc-item{font-size:9px;flex:1;text-align:center;line-height:1.35;letter-spacing:.02em;}
+
+/* Sky comparison */
+.intro-right{position:sticky;top:80px;}
+.compare-title{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin-bottom:11px;text-align:center;}
+#skyCanvas{width:100%;border-radius:10px;border:1px solid var(--border);display:block;cursor:ew-resize;}
+
+/* Bortle class track */
+.sky-class-track{display:flex;justify-content:space-between;margin-top:8px;gap:2px;}
+.sct-item{
+  flex:1;text-align:center;font-size:10px;padding:5px 2px;cursor:pointer;
+  border-radius:4px;border:1px solid transparent;color:var(--text-dim);
+  transition:all .15s;font-family:'IBM Plex Mono',monospace;
+}
+.sct-item:hover{color:var(--text);border-color:var(--border);}
+.sct-item.active{border-color:currentColor;background:rgba(255,255,255,0.05);}
+
+/* Class info panel */
+#skyClassInfo{
+  margin-top:10px;padding:10px 14px;
+  background:var(--bg2);border:1px solid var(--border);border-radius:7px;
+  font-size:11px;line-height:1.7;min-height:50px;
+  font-family:'IBM Plex Mono',monospace;
+}
+
+/* ── FINDER SECTION ──────────────────────────── */
+#finder{padding:60px 0 80px;border-top:1px solid var(--border);}
+.finder-head{text-align:center;margin-bottom:38px;}
+.finder-head h2{font-size:36px;margin-bottom:7px;}
+.finder-head p{font-size:11.5px;color:var(--text-dim);letter-spacing:.04em;}
+
+/* Search */
+.search-row{display:flex;gap:10px;max-width:680px;margin:0 auto 16px;}
+#searchInput{
+  flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:7px;
+  padding:11px 15px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:12.5px;
+  outline:none;transition:border-color .2s;
+}
+#searchInput::placeholder{color:var(--text-dim);}
+#searchInput:focus{border-color:var(--gold-dim);}
+#searchBtn{
+  background:var(--gold);border:none;border-radius:7px;padding:11px 22px;
+  color:var(--bg);font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:500;
+  cursor:pointer;letter-spacing:.05em;white-space:nowrap;transition:opacity .2s;
+}
+#searchBtn:hover{opacity:.82;}
+#searchBtn:disabled{opacity:.5;cursor:not-allowed;}
+
+.quick-cities{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin-bottom:28px;}
+.cpill{
+  background:var(--bg2);border:1px solid var(--border);border-radius:18px;
+  padding:4px 13px;font-size:10.5px;color:var(--text-dim);cursor:pointer;
+  transition:all .2s;letter-spacing:.04em;
+}
+.cpill:hover{border-color:var(--gold-dim);color:var(--gold);}
+
+#statusMsg{text-align:center;font-size:11px;min-height:20px;margin-bottom:6px;letter-spacing:.04em;}
+
+/* Map + Results layout */
+.finder-layout{display:grid;grid-template-columns:1fr 345px;gap:18px;height:610px;}
+.map-wrap{position:relative;height:100%;}
+#map{height:100%;border-radius:9px;border:1px solid var(--border);}
+
+/* Map overlay controls */
+.map-ctrl{
+  position:absolute;z-index:900;
+  background:rgba(6,7,13,0.88);backdrop-filter:blur(8px);
+  border:1px solid var(--border);border-radius:7px;
+  font-size:10px;color:var(--text-dim);cursor:pointer;
+  letter-spacing:.06em;text-transform:uppercase;
+}
+#lpToggle{top:10px;right:10px;padding:6px 10px;display:flex;align-items:center;gap:6px;transition:opacity .2s;}
+#lpToggle:hover{border-color:var(--border-s);}
+.lp-indicator{width:7px;height:7px;border-radius:50%;background:#7c3aed;transition:background .2s;}
+.map-legend{bottom:28px;right:10px;padding:10px 13px;pointer-events:none;}
+.legend-title{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:7px;}
+.legend-row{display:flex;align-items:center;gap:7px;margin:3px 0;font-size:9.5px;color:var(--text-dim);}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.legend-sep{height:1px;background:var(--border);margin:5px 0;}
+/* LP overlay data label */
+#lpDataLabel{
+  position:absolute;top:46px;right:10px;z-index:900;
+  background:rgba(6,7,13,0.88);border:1px solid var(--border);
+  border-radius:5px;padding:3px 9px;font-size:9px;
+  color:var(--text-dim);letter-spacing:.05em;pointer-events:none;
+}
+
+/* Results panel */
+.results-wrap{
+  height:100%;display:flex;flex-direction:column;
+  background:var(--bg2);border:1px solid var(--border);border-radius:9px;overflow:hidden;
+}
+.results-hdr{
+  padding:12px 15px;border-bottom:1px solid var(--border);flex-shrink:0;
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--text-dim);
+}
+#resultCount{color:var(--gold);font-size:9.5px;}
+#resultsPanel{flex:1;overflow-y:auto;padding:7px;}
+#resultsPanel::-webkit-scrollbar{width:3px;}
+#resultsPanel::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+/* Initial prompt */
+.init-prompt{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:24px;}
+.init-star{font-size:36px;opacity:.2;margin-bottom:14px;}
+.init-prompt p{font-size:11px;color:var(--text-dim);line-height:1.75;}
+
+/* Bands */
+.band{margin-bottom:6px;}
+.band-hdr{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:7px 10px;border-radius:5px;cursor:pointer;
+  font-size:10.5px;letter-spacing:.04em;
+  background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.04);
+  border-left-width:2.5px;transition:background .18s;
+}
+.band-hdr:hover{background:rgba(255,255,255,0.05);}
+.band-hdr-right{font-size:9.5px;opacity:.65;display:flex;align-items:center;gap:8px;}
+.band-arrow{transition:transform .2s;font-size:9px;}
+.band.collapsed .band-arrow{transform:rotate(-90deg);}
+.band.collapsed .band-body{display:none;}
+
+/* Site cards */
+.site-card{
+  background:var(--bg3);border:1px solid var(--border);border-radius:6px;
+  padding:9px 11px;margin:3px 0;cursor:pointer;transition:all .18s;
+}
+.site-card:hover{border-color:var(--border-s);transform:translateX(2px);}
+.card-top{display:flex;align-items:center;gap:7px;margin-bottom:3px;}
+.b-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.card-name{font-family:'Cormorant Garamond',serif;font-size:12.5px;font-weight:600;color:var(--text);flex:1;line-height:1.3;}
+.card-dist{font-size:10px;color:var(--gold);flex-shrink:0;font-weight:400;}
+.card-meta{font-size:9.5px;color:var(--text-dim);display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:2px;}
+.card-months{font-size:9.5px;color:var(--text-dim);}
+.card-note{font-size:9.5px;color:rgba(251,191,36,.72);margin-top:4px;line-height:1.45;}
+.badge{font-size:8.5px;padding:1px 6px;border-radius:9px;letter-spacing:.04em;white-space:nowrap;}
+.b-open{background:rgba(16,185,129,.13);color:#10b981;border:1px solid rgba(16,185,129,.28);}
+.b-perm{background:rgba(245,158,11,.13);color:#f59e0b;border:1px solid rgba(245,158,11,.28);}
+.b-rsv {background:rgba(99,102,241,.13);color:#818cf8;border:1px solid rgba(99,102,241,.28);}
+.no-results{padding:20px;text-align:center;font-size:11px;color:var(--text-dim);line-height:1.75;}
+
+/* Leaflet popup override */
+.leaflet-popup-content-wrapper{background:#0c0e1b!important;border:1px solid rgba(240,200,85,.2)!important;border-radius:9px!important;color:#e5ddc8!important;box-shadow:0 6px 28px rgba(0,0,0,.7)!important;}
+.leaflet-popup-tip{background:#0c0e1b!important;}
+.leaflet-popup-close-button{color:rgba(240,200,85,.5)!important;font-size:16px!important;}
+.leaflet-control-zoom{border:1px solid var(--border)!important;border-radius:6px!important;overflow:hidden;}
+.leaflet-control-zoom a{background:rgba(6,7,13,.9)!important;color:var(--text-dim)!important;border-bottom:1px solid var(--border)!important;}
+.leaflet-control-zoom a:hover{background:var(--bg3)!important;color:var(--gold)!important;}
+.leaflet-control-attribution{background:rgba(6,7,13,.7)!important;color:rgba(229,221,200,.35)!important;font-size:8px!important;}
+
+/* Footer */
+footer{border-top:1px solid var(--border);padding:28px 52px;display:flex;justify-content:space-between;align-items:center;font-size:9.5px;color:var(--text-dim);letter-spacing:.05em;}
+
+/* ── How-To section ─────────────────────────── */
+/* #howto section removed — grid now lives inside #finder */
+.howto-title{text-align:center;margin-bottom:32px;}
+.howto-title h2{font-size:30px;margin-bottom:6px;}
+.howto-title p{font-size:11.5px;color:var(--text-dim);letter-spacing:.04em;}
+.howto-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;}
+.howto-step{
+  background:var(--bg3);border:1px solid var(--border);border-radius:8px;
+  padding:18px 16px;position:relative;
+}
+.step-num{
+  font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;
+  color:var(--gold-dim);line-height:1;margin-bottom:10px;
+}
+.step-title{font-size:12px;font-weight:500;color:var(--text);margin-bottom:7px;letter-spacing:.03em;}
+.step-body{font-size:10.5px;color:var(--text-dim);line-height:1.75;}
+.step-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle;}
+
+/* ── JustAstronomy site nav ─────────────────────────── */
+canvas#sitestars{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+.site-nav{
+  position:sticky;top:0;z-index:2000;
+  background:rgba(8,12,22,0.93);backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(255,255,255,0.07);
+}
+.site-nav .nav-inner{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 24px;max-width:100%;
+}
+.site-nav .nav-logo{
+  font-family:'Cormorant Garamond',Georgia,serif;
+  font-size:21px;color:#e8e4d9;text-decoration:none;letter-spacing:.02em;
+}
+.site-nav .nav-logo span{color:#c9933a;}
+.site-nav .nav-links{display:flex;gap:24px;list-style:none;}
+.site-nav .nav-links a{
+  color:#8a93a8;font-size:12px;font-weight:500;
+  letter-spacing:.06em;text-transform:uppercase;
+  text-decoration:none;transition:color .2s;
+  font-family:'IBM Plex Mono',monospace;
+}
+.site-nav .nav-links a:hover,
+.site-nav .nav-links a.active{color:#c9933a;}
+
+/* ── Site footer ────────────────────────────────────── */
+.site-footer-wrap{
+  border-top:1px solid rgba(255,255,255,0.07);
+  padding:24px 52px;
+  position:relative;z-index:1;
+}
+.site-footer-inner{
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;
+}
+.footer-brand{
+  font-family:'Cormorant Garamond',serif;font-size:18px;
+  color:rgba(229,221,200,0.5);
+}
+.footer-brand .acc{color:#c9933a;}
+.footer-copy{font-size:9.5px;color:rgba(229,221,200,0.45);letter-spacing:.05em;}
+@media(max-width:640px){
+  .site-nav .nav-links{display:none;}
+  .site-footer-inner{flex-direction:column;text-align:center;}
+  .site-footer-wrap{padding:24px;}
+}
+</style>
+</head>
+<body>
+<canvas id="sitestars"></canvas>
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">Just<span>Astronomy</span></a>
+      <ul class="nav-links">
+        <li><a href="log.html">Log</a></li>
+        <li><a href="equipment.html">Equipment</a></li>
+        <li><a href="beginners.html">New Here?</a></li>
+        <li><a href="darksky.html" class="active">Dark Sky India</a></li>
+        <li><a href="events.html">Events</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </div>
+  </nav>
+
+
+<!-- ═══ INTRO SECTION ═══════════════════════════════════ -->
+<section id="intro">
+  <canvas id="starsBg"></canvas>
+  <div class="container intro-content">
+    <div class="intro-grid">
+
+      <!-- LEFT: text + bortle strip -->
+      <div class="intro-left">
+        <h2>Why do <em>dark skies</em><br>matter for astronomy?</h2>
+        <p>Light pollution — the brightening of the night sky by artificial lights — has quietly erased the stars for most of humanity. Over 80% of the world's population now lives under light-polluted skies. In India, hundreds of millions of people living in or near cities may never witness the Milky Way in their lifetimes.</p>
+        <p>For astronomers, a dark sky is not a preference — it is a prerequisite. At a truly dark site you can see thousands of stars, like diamonds strewn acrosss the sky, trace the full arc of the Milky Way, and spot faint nebulae and galaxies, all with the naked eye. That same sky from a typical Indian city? Fewer than 200 stars, the Milky Way entirely invisible, and a perpetual orange glow overhead.</p>
+        <p>Travelling even 150–200 km from a major city can jump you three or four Bortle classes — the difference between frustration and wonder.</p>
+
+        <div class="divider"></div>
+
+        <h3>✦ The Bortle Scale</h3>
+        <p>Developed by amateur astronomer John E. Bortle in 2001, the Bortle Dark-Sky Scale is a nine-level numeric measure of the darkness of the night sky at any location. <strong style="color:var(--text)">Class 1</strong> is the darkest sky on Earth — found only in extremely remote, high-altitude deserts and wilderness. <strong style="color:var(--text)">Class 9</strong> is the washed-out inner-city sky where only the Moon and a handful of the brightest stars cut through the orange glow.</p>
+        <p>The scale considers the visibility of faint objects, the darkness of the sky background, and the degree of light-pollution glow on the horizon — giving observers a practical, standardised way to assess a site before they travel.</p>
+
+        <div style="margin-top:22px;">
+          <div class="bortle-strip-label">Bortle Scale — Class 1 (best) → Class 9 (worst)</div>
+          <div class="bortle-bar"></div>
+          <div class="bortle-nums">
+            <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span>
+          </div>
+          <div class="bortle-desc-row" style="margin-top:5px;">
+            <div class="bortle-desc-item" style="color:#7c3aed;">Truly<br>Dark</div>
+            <div class="bortle-desc-item" style="color:#2563eb;">Excel-<br>lent</div>
+            <div class="bortle-desc-item" style="color:#0891b2;">Rural</div>
+            <div class="bortle-desc-item" style="color:#059669;">Rural/<br>Sub</div>
+            <div class="bortle-desc-item" style="color:#84cc16;">Sub-<br>urban</div>
+            <div class="bortle-desc-item" style="color:#eab308;">Bright<br>Sub</div>
+            <div class="bortle-desc-item" style="color:#f97316;">Sub/<br>Urban</div>
+            <div class="bortle-desc-item" style="color:#ef4444;">City</div>
+            <div class="bortle-desc-item" style="color:#be123c;">Inner<br>City</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: sky simulator -->
+      <div class="intro-right">
+        <div class="compare-title" id="compareTitle">Sky Simulator — drag to step through all 9 Bortle classes</div>
+        <canvas id="skyCanvas" width="580" height="300"></canvas>
+        <div class="sky-class-track" id="skyClassTrack">
+          <div class="sct-item active" data-b="1" style="color:#7c3aed;">B1</div>
+          <div class="sct-item" data-b="2" style="color:#2563eb;">B2</div>
+          <div class="sct-item" data-b="3" style="color:#0891b2;">B3</div>
+          <div class="sct-item" data-b="4" style="color:#059669;">B4</div>
+          <div class="sct-item" data-b="5" style="color:#84cc16;">B5</div>
+          <div class="sct-item" data-b="6" style="color:#eab308;">B6</div>
+          <div class="sct-item" data-b="7" style="color:#f97316;">B7</div>
+          <div class="sct-item" data-b="8" style="color:#ef4444;">B8</div>
+          <div class="sct-item" data-b="9" style="color:#be123c;">B9</div>
+        </div>
+        <div id="skyClassInfo"></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FINDER SECTION ══════════════════════════════════ -->
+
+<!-- ═══ HOW TO USE ══════════════════════════════════ -->
+<section id="finder">
+  <div class="container">
+    <div class="finder-head">
+      <h2>Find Your Dark Sky</h2>
+    </div>
+
+    <div class="howto-grid" style="margin-bottom:32px;">
+
+      <div class="howto-step">
+        <div class="step-num">01</div>
+        <div class="step-title">Search your location</div>
+        <div class="step-body">Type any Indian city name, or paste coordinates as <em>lat, lng</em>. Or tap one of the quick-select city pills. The map flies to your location and draws three distance rings.</div>
+      </div>
+
+      <div class="howto-step">
+        <div class="step-num">02</div>
+        <div class="step-title">Read the light pollution overlay</div>
+        <div class="step-body">The yellow-amber glow is satellite-measured night-time light. <strong style="color:var(--text)">Bright yellow = heavy light pollution.</strong> Dark areas = less artificial light = better for stargazing.</div>
+      </div>
+
+      <div class="howto-step">
+        <div class="step-num">03</div>
+        <div class="step-title">Browse the dark sites</div>
+        <div class="step-body">Sites appear in three distance bands — within 100 km, 100–200 km, and 200–500 km. Click any card to fly to it on the map and see full details in a popup.</div>
+      </div>
+
+      <div class="howto-step">
+        <div class="step-num">04</div>
+        <div class="step-title">Check site access</div>
+        <div class="step-body">
+          <span class="step-dot" style="background:#10b981;box-shadow:0 0 4px #10b981;"></span><strong style="color:#10b981;">Green</strong> — openly accessible.<br><br>
+          <span class="step-dot" style="background:#f59e0b;box-shadow:0 0 4px #f59e0b;"></span><strong style="color:#f59e0b;">Amber</strong> — advance permission needed.<br><br>
+          <span class="step-dot" style="background:#818cf8;box-shadow:0 0 4px #818cf8;"></span><strong style="color:#818cf8;">Blue</strong> — designated reserve; entry may be restricted.
+        </div>
+      </div>
+
+      <div class="howto-step">
+        <div class="step-num">05</div>
+        <div class="step-title">Toggle the overlay</div>
+        <div class="step-body">Use the <strong style="color:var(--text)">LP Overlay</strong> button at the top-right of the map to turn the night-light layer on or off.</div>
+      </div>
+
+    </div>
+
+    <div class="search-row">
+      <input type="text" id="searchInput" placeholder="City name  or  lat, lng  (e.g. 12.97, 77.59)"/>
+      <button id="searchBtn">Search ✦</button>
+    </div>
+
+    <div id="statusMsg"></div>
+
+    <div class="quick-cities">
+      <span class="cpill" data-lat="28.6139" data-lng="77.2090" data-name="Delhi">Delhi</span>
+      <span class="cpill" data-lat="19.0760" data-lng="72.8777" data-name="Mumbai">Mumbai</span>
+      <span class="cpill" data-lat="12.9716" data-lng="77.5946" data-name="Bengaluru">Bengaluru</span>
+      <span class="cpill" data-lat="13.0827" data-lng="80.2707" data-name="Chennai">Chennai</span>
+      <span class="cpill" data-lat="22.5726" data-lng="88.3639" data-name="Kolkata">Kolkata</span>
+      <span class="cpill" data-lat="17.3850" data-lng="78.4867" data-name="Hyderabad">Hyderabad</span>
+      <span class="cpill" data-lat="26.9157" data-lng="70.9083" data-name="Jaisalmer">Jaisalmer</span>
+      <span class="cpill" data-lat="34.1526" data-lng="77.5771" data-name="Leh">Leh</span>
+      <span class="cpill" data-lat="21.1458" data-lng="79.0882" data-name="Nagpur">Nagpur</span>
+      <span class="cpill" data-lat="23.0225" data-lng="72.5714" data-name="Ahmedabad">Ahmedabad</span>
+    </div>
+
+    <div class="finder-layout">
+      <!-- MAP -->
+      <div class="map-wrap">
+        <div id="map"></div>
+        <div class="map-ctrl" id="lpToggle">
+          <span class="lp-indicator" id="lpDot"></span>
+          LP Overlay
+        </div>
+        <div id="lpDataLabel">VIIRS · Cloud-free · NASA</div>
+        <div class="map-ctrl map-legend">
+          <div class="legend-title">Site Access</div>
+          <div class="legend-row"><div class="legend-dot" style="background:#10b981;box-shadow:0 0 5px #10b981;"></div>Openly accessible</div>
+          <div class="legend-row"><div class="legend-dot" style="background:#f59e0b;box-shadow:0 0 5px #f59e0b;"></div>Permission needed</div>
+          <div class="legend-row"><div class="legend-dot" style="background:#818cf8;box-shadow:0 0 5px #818cf8;"></div>Designated reserve</div>
+          <div class="legend-sep"></div>
+          <div class="legend-row"><div class="legend-dot" style="background:#f0c855;box-shadow:0 0 5px #f0c855;"></div>Your Location</div>
+          <div class="legend-sep"></div>
+          <div class="legend-title">Distance Rings</div>
+          <div class="legend-row"><div class="legend-dot" style="background:#00e5ff;box-shadow:0 0 5px #00e5ff;"></div>100 km</div>
+          <div class="legend-row"><div class="legend-dot" style="background:#c084fc;box-shadow:0 0 5px #c084fc;"></div>200 km</div>
+          <div class="legend-row"><div class="legend-dot" style="background:#f472b6;box-shadow:0 0 5px #f472b6;"></div>500 km</div>
+        </div>
+      </div>
+
+      <!-- RESULTS PANEL -->
+      <div class="results-wrap">
+        <div class="results-hdr">
+          <span>Dark Sites</span>
+          <span id="resultCount">—</span>
+        </div>
+        <div id="resultsPanel">
+          <div class="init-prompt">
+            <div class="init-star">✦</div>
+            <p>Search for a city above, or click a quick-select, to discover dark sky sites within 500 km</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer-wrap">
+  <div class="site-footer-inner">
+    <span class="footer-brand">Just<span class="acc">Astronomy</span></span>
+    <span class="footer-copy">
+      ✦ Dark Sky India &nbsp;·&nbsp;
+      Sites: IDA-designated + community &nbsp;·&nbsp;
+      LP tiles: NASA GIBS &nbsp;·&nbsp;
+      Maps: © CARTO / OSM
+    </span>
+  </div>
+</footer>
+
+<!-- ═══════════════ JAVASCRIPT ═══════════════════════════ -->
+<script>
+/* ─── Seeded RNG ─────────────────────────────── */
+function makeRng(seed){
+  let s=seed>>>0;
+  return ()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296;};
+}
+
+/* ─── Bortle colors ──────────────────────────── */
+// BC colour array used by sky simulator canvas
+const BC=['#7c3aed','#2563eb','#0891b2','#059669','#84cc16','#eab308','#f97316','#ef4444','#be123c'];
+// Pin colour = access type (not Bortle — LP overlay carries that information)
+function accessColor(s){
+  if(s.access==='permission')return'#f59e0b';
+  if(s.type==='reserve')return'#818cf8';
+  return'#10b981';
+}
+
+/* ─── DATA ───────────────────────────────────── */
+const SITES=[
+  // — Ladakh ————————————————————————————————
+  {id:1,name:"Hanle Dark Sky Reserve",region:"Ladakh",lat:32.7795,lng:78.9645,bortle:1,alt:4500,type:"reserve",access:"open",accessNote:"Open sky area; IAO observatory facilities are restricted to researchers.",months:"May–Oct",desc:"Among the darkest skies in Asia. Site of the Indian Astronomical Observatory (IAO) at 4500 m. Designated dark sky reserve."},
+  {id:2,name:"Nubra Valley",region:"Ladakh",lat:34.6975,lng:77.5567,bortle:1,alt:3048,type:"natural",access:"open",accessNote:"",months:"Jun–Sep",desc:"Cold desert valley between the Karakoram and Ladakh ranges. Extreme darkness from sheer remoteness."},
+  {id:3,name:"Pangong Tso",region:"Ladakh",lat:33.7613,lng:78.6438,bortle:1,alt:4350,type:"natural",access:"open",accessNote:"Inner Line Permit required for Indian nationals. Special permit for foreign nationals.",months:"May–Sep",desc:"High-altitude saltwater lake on the India–China border. One of the darkest accessible spots in India."},
+  {id:4,name:"Tso Moriri",region:"Ladakh",lat:32.9053,lng:78.2988,bortle:1,alt:4522,type:"natural",access:"open",accessNote:"",months:"Jun–Sep",desc:"Remote high-altitude lake with minimal human settlement. Extraordinary sky transparency."},
+  {id:5,name:"Zanskar Valley",region:"Ladakh",lat:33.4600,lng:76.8200,bortle:2,alt:3500,type:"natural",access:"open",accessNote:"Road access is seasonal; the valley is snowbound Nov–Apr.",months:"Jun–Oct",desc:"Remote valley ringed by the Zanskar Range. Very low population density preserves pristine skies."},
+
+  // — Himachal Pradesh ——————————————————————
+  {id:6,name:"Spiti Valley (Kaza)",region:"Himachal Pradesh",lat:32.2260,lng:78.0715,bortle:1,alt:3800,type:"natural",access:"open",accessNote:"Inner Line Permit required for foreign nationals.",months:"Jun–Oct",desc:"Cold high-altitude desert valley with near-pristine skies. Gateway to several world-class observing spots."},
+  {id:7,name:"Kibber Village",region:"Himachal Pradesh",lat:32.2047,lng:78.0022,bortle:1,alt:4270,type:"natural",access:"open",accessNote:"",months:"May–Oct",desc:"One of the highest permanently inhabited villages in the world reachable by road. Extraordinary darkness."},
+  {id:8,name:"Tabo",region:"Himachal Pradesh",lat:31.9778,lng:78.3897,bortle:2,alt:3050,type:"natural",access:"open",accessNote:"",months:"Jun–Oct",desc:"Ancient monastery town in the Spiti valley. Very dark skies with dramatic canyon backdrop."},
+  {id:9,name:"Tirthan Valley",region:"Himachal Pradesh",lat:31.6340,lng:77.5610,bortle:2,alt:1600,type:"natural",access:"open",accessNote:"",months:"Apr–Jun, Sep–Nov",desc:"Quiet valley bordering the Great Himalayan National Park. Excellent transparency, far from major towns."},
+  {id:10,name:"Bir Billing",region:"Himachal Pradesh",lat:32.0530,lng:76.7250,bortle:3,alt:1525,type:"natural",access:"open",accessNote:"",months:"Oct–Nov, Feb–Apr",desc:"India's paragliding capital. Surrounding ridgelines are dark; the valley town has minimal light pollution."},
+  {id:11,name:"Kalpa, Kinnaur",region:"Himachal Pradesh",lat:31.5300,lng:78.2600,bortle:2,alt:2960,type:"natural",access:"open",accessNote:"ILP required near Sumdo toward Tibet border.",months:"May–Oct",desc:"Apple-orchard village below Kinner Kailash. Remote and very dark; accessible via NH-5."},
+
+  // — Uttarakhand ———————————————————————————
+  {id:12,name:"Chopta",region:"Uttarakhand",lat:30.5025,lng:79.2360,bortle:2,alt:2680,type:"natural",access:"open",accessNote:"",months:"Sep–Nov, Apr–Jun",desc:"Pristine high meadows above Ukhimath, gateway to Tungnath. Very dark and atmospherically clear."},
+  {id:13,name:"Munsiyari",region:"Uttarakhand",lat:30.0695,lng:80.2330,bortle:2,alt:2200,type:"natural",access:"open",accessNote:"",months:"Apr–Jun, Sep–Nov",desc:"Remote hill station near the Nepal and Tibet tri-junctions. Excellent seeing conditions."},
+  {id:14,name:"Binsar Wildlife Sanctuary",region:"Uttarakhand",lat:29.7044,lng:79.7500,bortle:2,alt:2412,type:"natural",access:"open",accessNote:"Sanctuary entry fee applicable.",months:"Mar–Jun, Sep–Nov",desc:"Dense oak and rhododendron forest; 360° Himalayan panorama from the summit. Very dark."},
+  {id:15,name:"Deoria Tal",region:"Uttarakhand",lat:30.4940,lng:79.0500,bortle:2,alt:2438,type:"natural",access:"open",accessNote:"",months:"May–Jun, Sep–Oct",desc:"High-altitude lake reflecting Chaukhamba peaks. A favourite astrophotography destination."},
+  {id:16,name:"Auli",region:"Uttarakhand",lat:30.5262,lng:79.5640,bortle:2,alt:2519,type:"natural",access:"open",accessNote:"",months:"Oct–Feb (snow), May–Jun",desc:"Ski resort in winter, dark sky haven in summer. Clear Himalayan air above valley haze."},
+  {id:17,name:"Valley of Flowers",region:"Uttarakhand",lat:30.7280,lng:79.6090,bortle:2,alt:3600,type:"natural",access:"open",accessNote:"National Park entry fee required. Camping restricted to designated areas.",months:"Jul–Sep",desc:"UNESCO World Heritage Site with no vehicular traffic. Minimal light pollution in all directions."},
+  {id:18,name:"Dhanaulti",region:"Uttarakhand",lat:30.4285,lng:78.2645,bortle:3,alt:2250,type:"natural",access:"open",accessNote:"",months:"Oct–Feb",desc:"Quiet hill station above Mussoorie, away from city light domes. Good transparency."},
+
+  // — Rajasthan ——————————————————————————————
+  {id:19,name:"Sam Sand Dunes",region:"Rajasthan",lat:26.8788,lng:70.5740,bortle:2,alt:225,type:"natural",access:"open",accessNote:"",months:"Oct–Mar",desc:"Classic Thar Desert dunes with horizon-to-horizon darkness. Flat terrain gives a full 360° sky vault."},
+  {id:20,name:"Khuri Village",region:"Rajasthan",lat:26.5700,lng:70.5600,bortle:2,alt:230,type:"natural",access:"open",accessNote:"",months:"Oct–Mar",desc:"Less touristy than Sam; more remote desert experience with equally excellent dark skies."},
+  {id:21,name:"Khimsar Dunes",region:"Rajasthan",lat:27.1833,lng:73.9300,bortle:3,alt:200,type:"natural",access:"open",accessNote:"",months:"Oct–Mar",desc:"Desert dunes midway between Jodhpur and Jaisalmer. Good accessibility from both cities."},
+  {id:22,name:"Astroport Sariska",region:"Rajasthan",lat:27.3472,lng:76.4200,bortle:3,alt:350,type:"community",access:"permission",accessNote:"Advance booking required. Paid guided stargazing sessions; check availability on their website.",months:"Oct–Mar",desc:"India's first dedicated stargazing resort, adjacent to Sariska Tiger Reserve. Guided sessions with telescopes."},
+  {id:23,name:"Mount Abu",region:"Rajasthan",lat:24.5926,lng:72.7156,bortle:3,alt:1219,type:"natural",access:"open",accessNote:"",months:"Oct–Feb",desc:"Rajasthan's only hill station. Elevated position helps escape desert haze and valley light domes."},
+
+  // — Gujarat ————————————————————————————————
+  {id:24,name:"Rann of Kutch",region:"Gujarat",lat:23.7337,lng:70.8070,bortle:2,alt:30,type:"natural",access:"open",accessNote:"Permit required to enter the Rann area. Peak season (Rann Utsav) is Oct–Feb.",months:"Nov–Feb",desc:"Vast white salt desert expanse with near-zero surrounding light. Outstanding astrophotography horizon."},
+  {id:25,name:"Gir National Park periphery",region:"Gujarat",lat:21.1240,lng:70.8245,bortle:3,alt:200,type:"natural",access:"open",accessNote:"Core zone restricted. Forest periphery and buffer areas are accessible.",months:"Dec–Mar",desc:"Last refuge of the Asiatic lion. Buffer zone has good dark skies away from Sasan township."},
+
+  // — Maharashtra ————————————————————————————
+  {id:26,name:"Bhandardara",region:"Maharashtra",lat:19.5333,lng:73.7581,bortle:4,alt:770,type:"natural",access:"open",accessNote:"",months:"Oct–Mar",desc:"Popular with Mumbai stargazers. Sahyadri hills location; accessible and still dark enough for rewarding sessions."},
+  {id:27,name:"Harishchandragad",region:"Maharashtra",lat:19.3880,lng:73.7700,bortle:3,alt:1424,type:"natural",access:"open",accessNote:"Trek required — no motorable road to summit. Forest dept permission needed for overnight stay.",months:"Oct–Feb",desc:"Ancient hill fort in the Sahyadri. Elevation places you above valley haze for noticeably darker skies."},
+  {id:28,name:"Rajmachi Fort",region:"Maharashtra",lat:18.8067,lng:73.3867,bortle:4,alt:925,type:"community",access:"permission",accessNote:"Overnight trekking with guides recommended. Village homestays available; no formal permit but guided trek advised.",months:"Oct–Feb",desc:"Trek destination regularly used by Pune astronomy clubs as a dark site escape from city light domes."},
+  {id:29,name:"Tadoba NP periphery",region:"Maharashtra",lat:20.3849,lng:79.3294,bortle:3,alt:300,type:"natural",access:"open",accessNote:"Core zone restricted. Buffer-zone eco-lodges have open sky access.",months:"Nov–Mar",desc:"Central India wilderness. Buffer zone has minimal light pollution in all directions."},
+  {id:30,name:"Nagzira Wildlife Sanctuary",region:"Maharashtra",lat:21.3300,lng:79.9700,bortle:3,alt:350,type:"natural",access:"open",accessNote:"",months:"Nov–Apr",desc:"Teak forest reserve in Vidarbha. Low surrounding population density preserves dark skies year-round."},
+
+  // — Karnataka ——————————————————————————————
+  {id:31,name:"Coorg (Madikeri area)",region:"Karnataka",lat:12.4218,lng:75.7382,bortle:3,alt:1082,type:"natural",access:"open",accessNote:"",months:"Oct–Mar (avoid monsoon)",desc:"Coffee estate hills with clear, dark skies. Pre-dawn mist often clears for excellent planetary views."},
+  {id:32,name:"Chikmagalur Hilltops",region:"Karnataka",lat:13.3153,lng:75.7754,bortle:3,alt:1090,type:"natural",access:"open",accessNote:"",months:"Oct–Feb",desc:"Coffee and tea estate terrain. Mullayanagiri (Karnataka's highest peak) area is particularly good."},
+  {id:33,name:"Nagarhole NP (periphery)",region:"Karnataka",lat:12.0556,lng:76.1265,bortle:3,alt:780,type:"natural",access:"open",accessNote:"Core zone restricted after sunset. Approved forest lodges have open sky access.",months:"Oct–Apr",desc:"Dense deciduous forest with excellent transparency. Forest canopy reduces ground-level stray light."},
+  {id:34,name:"Bisle Reserve Forest",region:"Karnataka",lat:12.7500,lng:75.7800,bortle:3,alt:1100,type:"natural",access:"permission",accessNote:"Entry gate may close at sunset. Contact forest department for overnight photography permits.",months:"Nov–Mar",desc:"Dense Shola forest on the Western Ghats crest. Viewpoint famous for sea-of-clouds and dark skies."},
+
+  // — Andhra Pradesh / Telangana ————————————
+  {id:35,name:"Horsley Hills",region:"Andhra Pradesh",lat:13.6576,lng:78.3985,bortle:4,alt:1265,type:"natural",access:"open",accessNote:"",months:"Oct–Mar",desc:"Eastern Ghats plateau visited regularly by local amateur astronomy clubs. Modest but worthwhile skies."},
+  {id:36,name:"Araku Valley",region:"Andhra Pradesh",lat:18.3266,lng:82.8750,bortle:3,alt:900,type:"natural",access:"open",accessNote:"",months:"Oct–Feb",desc:"Tribal hill region in the Eastern Ghats. Very low surrounding development and excellent transparency."},
+  {id:37,name:"Nagarjunasagar-Srisailam TR",region:"Telangana / AP",lat:16.5000,lng:78.8700,bortle:3,alt:200,type:"natural",access:"open",accessNote:"Core zone restricted. Buffer areas and dam viewpoints are accessible.",months:"Nov–Mar",desc:"India's largest tiger reserve by area. Interior regions have minimal light pollution."},
+
+  // — Tamil Nadu / Kerala ————————————————————
+  {id:38,name:"Kodaikanal",region:"Tamil Nadu",lat:10.2381,lng:77.4892,bortle:3,alt:2133,type:"natural",access:"open",accessNote:"",months:"Oct–Feb",desc:"High plateau in the Palani Hills. Lower humidity than plains; Kodaikanal Solar Observatory is nearby."},
+  {id:39,name:"Valparai Plateau",region:"Tamil Nadu",lat:10.3241,lng:76.9560,bortle:3,alt:1050,type:"natural",access:"open",accessNote:"",months:"Nov–Mar",desc:"Dead-end tea estate plateau — very low traffic and minimal lighting. Surprisingly dark for South India."},
+  {id:40,name:"Munnar Hilltops",region:"Kerala",lat:10.0889,lng:77.0595,bortle:3,alt:1600,type:"natural",access:"open",accessNote:"",months:"Oct–Feb",desc:"Tea estate hills. High elevation reduces atmospheric distortion; good transparency post-monsoon."},
+  {id:41,name:"Wayanad (Chembra area)",region:"Kerala",lat:11.4835,lng:76.0930,bortle:3,alt:700,type:"natural",access:"open",accessNote:"Chembra Peak trek requires a Forest Dept permit from Meppadi office.",months:"Nov–Feb",desc:"Forested plateau. Chembra Peak (Wayanad's highest) gives panoramic dark sky views."},
+  {id:42,name:"Agasthyamalai Biosphere",region:"Kerala / Tamil Nadu",lat:8.6230,lng:77.2330,bortle:2,alt:1200,type:"natural",access:"permission",accessNote:"Core zone access requires special forest dept permit. Very limited tourism; plan well in advance.",months:"Jan–Mar",desc:"One of the darkest remaining spots in peninsular India. Extremely low surrounding population density."},
+
+  // — Madhya Pradesh ——————————————————————————
+  {id:43,name:"Pench National Park",region:"Madhya Pradesh",lat:21.7508,lng:79.6341,bortle:3,alt:450,type:"natural",access:"open",accessNote:"Core area restricted after sunset. Buffer-zone lodges have open sky access.",months:"Nov–Apr",desc:"Kipling's Jungle Book landscape. Central India provides good darkness away from major cities."},
+  {id:44,name:"Panna National Park",region:"Madhya Pradesh",lat:24.7295,lng:80.0240,bortle:3,alt:380,type:"natural",access:"open",accessNote:"",months:"Nov–Apr",desc:"Ken River gorge and Bundelkhand plateau. Remote location gives reliably dark skies."},
+  {id:45,name:"Pachmarhi",region:"Madhya Pradesh",lat:22.4674,lng:78.4348,bortle:3,alt:1067,type:"natural",access:"open",accessNote:"",months:"Oct–Mar",desc:"Only hill station in MP. Satpura range elevation. Used by amateur astronomy camps."},
+
+  // — Northeast ——————————————————————————————
+  {id:46,name:"Dzukou Valley",region:"Nagaland / Manipur",lat:25.5500,lng:94.0900,bortle:2,alt:2438,type:"natural",access:"open",accessNote:"Trek of ~12 km required; no road access. Carry all gear. Basic campsite available.",months:"Jun–Sep",desc:"Remote high-altitude valley on the Nagaland–Manipur border. Some of the darkest skies in Northeast India."},
+  {id:47,name:"Tawang",region:"Arunachal Pradesh",lat:27.5861,lng:91.8594,bortle:2,alt:3048,type:"natural",access:"open",accessNote:"Inner Line Permit required for all Indian nationals. Special permit for foreign nationals.",months:"Apr–Jun, Sep–Oct",desc:"High-altitude Buddhist town near Bhutan. Among the clearest high-altitude sites accessible from India."},
+  {id:48,name:"Ziro Valley",region:"Arunachal Pradesh",lat:27.5445,lng:93.8260,bortle:2,alt:1688,type:"natural",access:"open",accessNote:"Inner Line Permit required.",months:"Apr–Jun, Oct–Nov",desc:"UNESCO tentative heritage site. Very low development and exceptional, stable dark skies."},
+  {id:49,name:"Kaziranga (north periphery)",region:"Assam",lat:26.5775,lng:93.1715,bortle:3,alt:40,type:"natural",access:"open",accessNote:"Park core restricted. North bank eco-lodges have open sky access.",months:"Nov–Apr",desc:"UNESCO World Heritage Site. North bank peripheral areas have surprisingly dark skies for plains India."},
+
+  // — Odisha ——————————————————————————————————
+  {id:50,name:"Simlipal Biosphere Reserve",region:"Odisha",lat:21.8600,lng:86.4200,bortle:3,alt:900,type:"natural",access:"permission",accessNote:"Advance booking via Forest Dept is mandatory. Entry is restricted and overnight permits are very limited.",months:"Nov–Mar",desc:"Dense Sal forest. Core zone has zero surrounding light pollution; one of India's least-visited tiger reserves."},
+  {id:51,name:"Koraput Plateau",region:"Odisha",lat:18.8135,lng:82.7100,bortle:3,alt:900,type:"natural",access:"open",accessNote:"",months:"Oct–Feb",desc:"Tribal upland with minimal urbanisation. Low population density naturally preserves dark skies."},
+];
+
+/* ─── MAP STATE ──────────────────────────────── */
+let map, lpLayer, userMarker;
+let radCircles=[], siteMarkers=[];
+let lpOn=true;
+
+/* ─── HAVERSINE ──────────────────────────────── */
+function hav(lat1,lon1,lat2,lon2){
+  const R=6371,dLa=(lat2-lat1)*Math.PI/180,dLo=(lon2-lon1)*Math.PI/180;
+  const a=Math.sin(dLa/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLo/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+/* ─── MAP INIT ───────────────────────────────── */
+function initMap(){
+  if(typeof L==='undefined'){
+    document.getElementById('map').innerHTML=
+      '<div style="display:flex;align-items:center;justify-content:center;height:100%;'+
+      'color:var(--text-dim);font-size:12px;text-align:center;padding:24px;line-height:1.7;">'+
+      '⚠ Map library failed to load.<br>Please check your internet connection and reload.</div>';
+    return;
+  }
+
+  map=L.map('map',{center:[20,78],zoom:5,zoomControl:true});
+
+  // Ensure the map background is dark so screen-blend works correctly
+  map.getContainer().style.background='#06070d';
+
+  // Dark basemap
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+    attribution:'© CARTO © OSM',maxZoom:19,subdomains:'abcd'
+  }).addTo(map);
+
+  // ── LP overlay: VIIRS CityLights 2012 (cloud-free annual composite, NASA) ──
+  // Rendered through a custom pane with:
+  //   mix-blend-mode: screen  → dark sky areas become transparent, showing the
+  //                             basemap's dark blue through; city pixels stay bright
+  //   CSS filter              → sepia + saturate + hue-rotate transforms the
+  //                             greyscale radiance into a warm yellow/gold city glow
+  // Result: cities glow amber-yellow, dark rural sky stays deep blue — no clouds,
+  // always reliable, visually matches the Blue/Yellow Black Marble aesthetic.
+  map.createPane('lpPane');
+  const lpPaneEl = map.getPane('lpPane');
+  lpPaneEl.style.zIndex      = '300';
+  lpPaneEl.style.mixBlendMode= 'screen';
+  lpPaneEl.style.filter      = 'sepia(1) saturate(3) hue-rotate(5deg) brightness(1.15)';
+  lpPaneEl.style.pointerEvents='none';
+
+  lpLayer=L.tileLayer(
+    'https://map1.vis.earthdata.nasa.gov/wmts-webmerc/VIIRS_CityLights_2012/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpg',
+    {pane:'lpPane',attribution:'© NASA Worldview',maxNativeZoom:8,maxZoom:19,opacity:1.0}
+  );
+  lpLayer.addTo(map);
+
+  SITES.forEach(s=>{ siteMarkers.push(makeMarker(s,false)); });
+}
+
+function makeMarker(site,highlight){
+  const col=accessColor(site);
+  const sz=highlight?15:10;
+  const gl=highlight?12:6;
+  const html=`<div style="width:${sz}px;height:${sz}px;background:${col};border-radius:50%;border:${highlight?2:1.5}px solid rgba(255,255,255,0.55);box-shadow:0 0 ${gl}px ${col};"></div>`;
+  const icon=L.divIcon({html,className:'',iconSize:[sz,sz],iconAnchor:[sz/2,sz/2]});
+  const permHtml=site.access==='permission'?`<div style="color:#fbbf24;margin-top:5px;font-size:11px;">⚠ ${site.accessNote}</div>`:'';
+  const pop=`<div style="font-size:12px;max-width:220px;line-height:1.55;font-family:'IBM Plex Mono',monospace;">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:700;margin-bottom:4px;">${site.name}</div>
+    <div style="color:#aaa;margin-bottom:2px;">${site.alt}m · ${site.region}</div>
+    <div style="font-size:11px;color:#aaa;line-height:1.6;">${site.desc}</div>
+    <div style="color:#888;font-size:11px;margin-top:5px;">📅 Best months: ${site.months}</div>
+    ${permHtml}
+  </div>`;
+  return L.marker([site.lat,site.lng],{icon}).bindPopup(pop,{maxWidth:250}).addTo(map);
+}
+
+/* ─── GEOCODE ────────────────────────────────── */
+async function geocode(q){
+  const r=await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&countrycodes=in&format=json&limit=1`);
+  const d=await r.json();
+  if(!d.length)throw new Error('Not found');
+  return{lat:parseFloat(d[0].lat),lng:parseFloat(d[0].lon),name:d[0].display_name.split(',')[0]};
+}
+
+/* ─── SEARCH HANDLER ─────────────────────────── */
+async function doSearch(lat,lng,name){
+  if(!map){document.getElementById('statusMsg').textContent='⚠ Map not available — check your connection.';return;}
+  // Clear old layers
+  radCircles.forEach(c=>map.removeLayer(c)); radCircles=[];
+  siteMarkers.forEach(m=>map.removeLayer(m)); siteMarkers=[];
+  if(userMarker)map.removeLayer(userMarker);
+
+  map.flyTo([lat,lng],7,{duration:1.8});
+
+  userMarker=L.circleMarker([lat,lng],{
+    radius:7,fillColor:'#f0c855',fillOpacity:1,color:'#fff',weight:2.5,zIndexOffset:1000
+  }).bindPopup(`<b style="font-family:'Cormorant Garamond',serif;font-size:15px;">${name}</b>`).addTo(map);
+
+  // Rings — cool colours (cyan / violet / pink) contrast against the warm LP overlay
+  [[100000,'#00e5ff'],[200000,'#c084fc'],[500000,'#f472b6']].forEach(([r,col])=>{
+    radCircles.push(L.circle([lat,lng],{
+      radius:r,color:col,weight:2.5,dashArray:'7 7',
+      opacity:1,fill:true,fillColor:col,fillOpacity:0.06
+    }).addTo(map));
+  });
+
+  // Sites with distances
+  const all=SITES.map(s=>({...s,dist:Math.round(hav(lat,lng,s.lat,s.lng))})).sort((a,b)=>a.dist-b.dist);
+  const inRange=all.filter(s=>s.dist<=500);
+  const outRange=all.filter(s=>s.dist>500);
+
+  inRange.forEach(s=>siteMarkers.push(makeMarker(s,true)));
+  outRange.forEach(s=>siteMarkers.push(makeMarker(s,false)));
+
+  renderResults(inRange,name);
+  document.getElementById('resultCount').textContent=`${inRange.length} found`;
+}
+
+/* ─── RESULTS ────────────────────────────────── */
+function renderResults(sites,city){
+  const panel=document.getElementById('resultsPanel');
+  if(!sites.length){
+    panel.innerHTML=`<div class="no-results">No dark sites found within 500 km of <strong>${city}</strong>.<br>Try a location farther from a major metro.</div>`;
+    return;
+  }
+  const b1=sites.filter(s=>s.dist<=100);
+  const b2=sites.filter(s=>s.dist>100&&s.dist<=200);
+  const b3=sites.filter(s=>s.dist>200&&s.dist<=500);
+  panel.innerHTML=[
+    b1.length?band('Within 100 km',b1,'#10b981','z1'):'',
+    b2.length?band('100 – 200 km',b2,'#f59e0b','z2'):'',
+    b3.length?band('200 – 500 km',b3,'#f97316','z3'):'',
+  ].join('');
+  panel.querySelectorAll('.site-card').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const la=parseFloat(el.dataset.lat),lo=parseFloat(el.dataset.lng);
+      map.flyTo([la,lo],10,{duration:1.2});
+      const m=siteMarkers.find(x=>{const ll=x.getLatLng();return Math.abs(ll.lat-la)<0.001&&Math.abs(ll.lng-lo)<0.001;});
+      if(m)setTimeout(()=>m.openPopup(),1100);
+    });
+  });
+}
+
+function band(title,sites,col,id){
+  return`<div class="band" id="${id}">
+    <div class="band-hdr" onclick="this.parentElement.classList.toggle('collapsed')" style="border-left-color:${col};">
+      <span style="color:${col};">${title}</span>
+      <div class="band-hdr-right">
+        <span>${sites.length} site${sites.length!==1?'s':''}</span>
+        <span class="band-arrow">▾</span>
+      </div>
+    </div>
+    <div class="band-body">${sites.map(siteCard).join('')}</div>
+  </div>`;
+}
+
+function siteCard(s){
+  const col=accessColor(s);
+  const badge=s.access==='permission'?'<span class="badge b-perm">⚠ Permission</span>':
+               s.type==='reserve'?'<span class="badge b-rsv">Reserve</span>':
+               '<span class="badge b-open">Open</span>';
+  const note=(s.access==='permission'&&s.accessNote)?`<div class="card-note">ℹ ${s.accessNote}</div>`:'';
+  return`<div class="site-card" data-lat="${s.lat}" data-lng="${s.lng}">
+    <div class="card-top">
+      <span class="b-dot" style="background:${col};box-shadow:0 0 5px ${col};"></span>
+      <span class="card-name">${s.name}</span>
+      <span class="card-dist">${s.dist} km</span>
+    </div>
+    <div class="card-meta">${s.region} · ${s.alt}m ${badge}</div>
+    <div class="card-months">📅 ${s.months}</div>
+    ${note}
+  </div>`;
+}
+
+/* ─── SKY SIMULATOR CANVAS ───────────────────── */
+function initSkyCanvas(){
+  const cv=document.getElementById('skyCanvas');
+  if(!cv)return;
+  const W=cv.width,H=cv.height;
+  const ctx=cv.getContext('2d');
+  let dx=0,dragging=false; // start at B1 (left edge)
+
+  /* ── Pre-generate star catalog, sorted brightest → faintest ── */
+  const rng=makeRng(7654321);
+  const CATALOG=[];
+  for(let i=0;i<420;i++){
+    const x=rng()*W, y=rng()*H;
+    const bright=rng()<0.13;
+    const r=bright?rng()*1.95+0.65:rng()*0.58+0.07;
+    const cr=rng(), al=0.2+rng()*0.8;
+    CATALOG.push({x,y,r,cr,al});
+  }
+  CATALOG.sort((a,b)=>b.r-a.r); // brightest first → faintest disappear as B increases
+
+  /* ── Bortle class parameters ── */
+  // skyTop/Bot as [R,G,B], lp=glow strength 0-1, mw=milky way alpha, n=star count
+  const BP=[
+    {st:[2,3,9],   sb:[4,7,20],  lp:0.00, mw:0.130, n:420, name:'Truly Dark Sky',        desc:'Airglow visible · Gegenschein obvious · zodiacal band traceable · 7.6–8.0 mag limit'},
+    {st:[2,4,9],   sb:[6,10,28], lp:0.03, mw:0.095, n:340, name:'Excellent Dark Sky',    desc:'Airglow subtle · Milky Way highly structured · M33 direct vision · ~7.1–7.5 mag'},
+    {st:[3,5,10],  sb:[7,9,30],  lp:0.09, mw:0.065, n:255, name:'Rural Sky',             desc:'Milky Way obvious · faint LP glow at horizon edges · limiting mag ~6.6–7.0'},
+    {st:[5,6,12],  sb:[8,11,30], lp:0.17, mw:0.028, n:175, name:'Rural / Suburban',      desc:'Milky Way visible but faint near horizon · LP domes noticeable · ~6.1–6.5 mag'},
+    {st:[7,8,14],  sb:[11,14,32],lp:0.28, mw:0.000, n:112, name:'Suburban Sky',          desc:'Milky Way washed near horizon · LP obviously bright · limiting mag ~5.6–6.0'},
+    {st:[13,10,9], sb:[30,18,7], lp:0.40, mw:0.000, n:62,  name:'Bright Suburban Sky',   desc:'Milky Way only visible near zenith · sky strongly lit · limiting mag ~5.1–5.5'},
+    {st:[24,13,6], sb:[58,26,8], lp:0.57, mw:0.000, n:30,  name:'Sub-Urban Transition',  desc:'Milky Way invisible · sky glows orange · only ~200 stars visible · ~4.6–5.0 mag'},
+    {st:[40,15,5], sb:[88,36,8], lp:0.73, mw:0.000, n:14,  name:'City Sky',              desc:'Only bright stars visible · severe orange glow · LP dominant · ~4.1–4.5 mag'},
+    {st:[60,17,4], sb:[118,46,8],lp:0.88, mw:0.000, n:6,   name:'Inner City Sky',        desc:'Moon & a handful of stars only · sky fully orange · limiting mag below 4.0'},
+  ];
+
+  function lerp(a,b,t){return a+(b-a)*t;}
+  function lArr(a,b,t){return a.map((v,i)=>Math.round(lerp(v,b[i],t)));}
+
+  /* get smoothly interpolated params for pixel position x */
+  function params(x){
+    const t=Math.max(0,Math.min(0.9999,x/W));
+    const fi=t*8, lo=Math.floor(fi), hi=Math.min(8,lo+1), fr=fi-lo;
+    const p0=BP[lo],p1=BP[hi];
+    return{
+      st:lArr(p0.st,p1.st,fr), sb:lArr(p0.sb,p1.sb,fr),
+      lp:lerp(p0.lp,p1.lp,fr), mw:lerp(p0.mw,p1.mw,fr),
+      n:Math.round(lerp(p0.n,p1.n,fr)),
+      bClass:lo+1, name:p0.name, desc:p0.desc
+    };
+  }
+
+  function drawSkyBg(p){
+    const g=ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,`rgb(${p.st})`);
+    g.addColorStop(1,`rgb(${p.sb})`);
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  }
+
+  function drawMW(alpha){
+    if(alpha<=0)return;
+    ctx.save();
+    ctx.translate(W*0.52,H*0.43); ctx.rotate(-0.48);
+    for(let i=-4;i<=4;i++){
+      const a=Math.max(0,alpha-Math.abs(i)*0.018);
+      if(a<=0)continue;
+      const mg=ctx.createLinearGradient(i*20-28,0,i*20+28,0);
+      mg.addColorStop(0,'rgba(185,215,255,0)');
+      mg.addColorStop(0.5,`rgba(198,220,255,${a})`);
+      mg.addColorStop(1,'rgba(185,215,255,0)');
+      ctx.fillStyle=mg; ctx.fillRect(i*20-28,-H,56,H*2);
+    }
+    ctx.restore();
+  }
+
+  function drawLP(strength){
+    if(strength<=0)return;
+    [[W*0.42,H*1.35,H*1.15,1],[W*0.8,H*1.25,H*0.9,0.65],[W*-0.05,H*1.4,H*0.72,0.42]].forEach(([cx,cy,r,w])=>{
+      const op=strength*w;
+      const cg=ctx.createRadialGradient(cx,cy,5,cx,cy,r);
+      cg.addColorStop(0,`rgba(255,128,22,${op})`);
+      cg.addColorStop(0.45,`rgba(255,90,10,${op*0.32})`);
+      cg.addColorStop(1,'rgba(255,45,0,0)');
+      ctx.fillStyle=cg; ctx.fillRect(0,0,W,H);
+    });
+    const hz=ctx.createLinearGradient(0,H*0.48,0,H);
+    hz.addColorStop(0,`rgba(185,82,22,0)`);
+    hz.addColorStop(1,`rgba(225,105,30,${strength*0.38})`);
+    ctx.fillStyle=hz; ctx.fillRect(0,0,W,H);
+  }
+
+  function drawStars(n,bClass){
+    const stars=CATALOG.slice(0,n);
+    stars.forEach(s=>{
+      let col;
+      const a=bClass>=7?s.al*0.7:s.al;
+      if(bClass<=3&&s.cr<0.07)       col=`rgba(162,192,255,${a})`;
+      else if(bClass<=3&&s.cr<0.13)  col=`rgba(255,220,158,${a})`;
+      else if(bClass>=6)              col=`rgba(255,244,200,${a*0.75})`;
+      else                            col=`rgba(255,255,255,${a})`;
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=col; ctx.fill();
+      // glow on bright stars in dark skies
+      if(s.r>1.3&&bClass<=5){
+        const gw=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r*7);
+        gw.addColorStop(0,'rgba(255,255,255,0.09)');
+        gw.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle=gw;
+        ctx.fillRect(s.x-s.r*7,s.y-s.r*7,s.r*14,s.r*14);
+      }
+    });
+  }
+
+  function drawHandle(x,bClass){
+    const col=BC[bClass-1];
+    // dashed guide line
+    ctx.save();
+    ctx.strokeStyle='rgba(240,200,85,0.45)'; ctx.lineWidth=1.2; ctx.setLineDash([3,5]);
+    ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke();
+    ctx.setLineDash([]); ctx.restore();
+    // outer ring
+    ctx.beginPath(); ctx.arc(x,H/2,20,0,Math.PI*2);
+    ctx.fillStyle='rgba(6,7,13,0.82)'; ctx.fill();
+    ctx.strokeStyle=col; ctx.lineWidth=2.2; ctx.stroke();
+    // class label
+    ctx.fillStyle=col;
+    ctx.font='bold 13px "IBM Plex Mono",monospace';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(`B${bClass}`,x,H/2+0.5);
+  }
+
+  function updateUI(bClass,p){
+    const col=BC[bClass-1];
+    // info panel
+    const info=document.getElementById('skyClassInfo');
+    if(info) info.innerHTML=
+      `<span style="color:${col};font-weight:500;">Class ${bClass} — ${p.name}</span><br>`+
+      `<span style="color:var(--text-dim);">${p.desc}</span>`;
+    // track pills
+    document.querySelectorAll('.sct-item').forEach(el=>{
+      el.classList.toggle('active', parseInt(el.dataset.b)===bClass);
+    });
+  }
+
+  function render(){
+    const p=params(dx);
+    drawSkyBg(p);
+    drawMW(p.mw);
+    drawLP(p.lp);
+    drawStars(p.n, p.bClass);
+    drawHandle(dx, p.bClass);
+    updateUI(p.bClass, p);
+  }
+
+  render(); // draw B1 on load
+
+  /* ── Drag ── */
+  cv.addEventListener('mousedown',e=>{dragging=true;e.preventDefault();});
+  window.addEventListener('mouseup',()=>dragging=false);
+  window.addEventListener('mousemove',e=>{
+    if(!dragging)return;
+    const rect=cv.getBoundingClientRect(),sc=W/rect.width;
+    dx=Math.max(0,Math.min(W-1,(e.clientX-rect.left)*sc)); render();
+  });
+  cv.addEventListener('touchstart',e=>{dragging=true;e.preventDefault();},{passive:false});
+  window.addEventListener('touchend',()=>dragging=false);
+  window.addEventListener('touchmove',e=>{
+    if(!dragging)return;
+    const rect=cv.getBoundingClientRect(),sc=W/rect.width;
+    dx=Math.max(0,Math.min(W-1,(e.touches[0].clientX-rect.left)*sc)); render(); e.preventDefault();
+  },{passive:false});
+
+  /* ── Click on track pill ── */
+  document.querySelectorAll('.sct-item').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const b=parseInt(el.dataset.b);
+      dx=((b-1)/8)*W; render();
+    });
+  });
+}
+
+/* ─── STARS BG ───────────────────────────────── */
+function initStarsBg(){
+  const cv=document.getElementById('starsBg');
+  if(!cv)return;
+  const sec=document.getElementById('intro');
+  cv.width=sec.offsetWidth;cv.height=sec.offsetHeight;
+  const ctx=cv.getContext('2d');
+  const rng=makeRng(99887);
+  for(let i=0;i<180;i++){
+    const x=rng()*cv.width,y=rng()*cv.height;
+    const r=rng()<0.9?rng()*0.38+0.08:rng()*0.75+0.3;
+    ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(255,255,255,${rng()*0.18+0.03})`;ctx.fill();
+  }
+}
+
+/* ─── LP TOGGLE ──────────────────────────────── */
+function initLPToggle(){
+  const dot  = document.getElementById('lpDot');
+  const label= document.getElementById('lpDataLabel');
+  document.getElementById('lpToggle').addEventListener('click',()=>{
+    if(!map||!lpLayer)return;
+    if(lpOn){
+      map.removeLayer(lpLayer);
+      dot.style.background='#444';
+      if(label){label.style.opacity='0.35';}
+    }else{
+      lpLayer.addTo(map);
+      dot.style.background='#7c3aed';
+      if(label){label.style.opacity='1';}
+    }
+    lpOn=!lpOn;
+  });
+}
+
+/* ─── SEARCH UI ──────────────────────────────── */
+function initSearch(){
+  const btn=document.getElementById('searchBtn');
+  const inp=document.getElementById('searchInput');
+  const msg=document.getElementById('statusMsg');
+
+  async function run(){
+    const q=inp.value.trim();if(!q)return;
+    btn.disabled=true;msg.style.color='var(--gold)';msg.textContent='✦  Locating…';
+    const m=q.match(/^(-?\d+\.?\d*)\s*[,\s]\s*(-?\d+\.?\d*)$/);
+    if(m){
+      const la=parseFloat(m[1]),lo=parseFloat(m[2]);
+      msg.textContent='';btn.disabled=false;
+      doSearch(la,lo,`${la.toFixed(4)}, ${lo.toFixed(4)}`);
+      return;
+    }
+    try{
+      const res=await geocode(q);
+      msg.textContent='';btn.disabled=false;
+      doSearch(res.lat,res.lng,res.name);
+    }catch{
+      msg.style.color='#ef4444';msg.textContent='Location not found — try a different city name.';
+      btn.disabled=false;
+    }
+  }
+
+  btn.addEventListener('click',run);
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')run();});
+
+  document.querySelectorAll('.cpill').forEach(p=>{
+    p.addEventListener('click',()=>{
+      inp.value=p.dataset.name;
+      msg.textContent='';
+      doSearch(parseFloat(p.dataset.lat),parseFloat(p.dataset.lng),p.dataset.name);
+    });
+  });
+}
+
+/* ─── NAV ────────────────────────────────────── */
+function initNav(){
+  document.querySelectorAll('nav a').forEach(a=>{
+    a.addEventListener('click',e=>{
+      e.preventDefault();
+      document.getElementById(a.getAttribute('href').slice(1))?.scrollIntoView({behavior:'smooth'});
+    });
+  });
+}
+
+/* ─── BOOT ───────────────────────────────────── */
+document.addEventListener('DOMContentLoaded',()=>{
+  initStarsBg();
+  initSkyCanvas();
+  initMap();
+  initLPToggle();
+  initSearch();
+  initNav();
+});
+</script>
+
+<script>
+// Site background star canvas (id="sitestars")
+(function(){
+  const cv=document.getElementById('sitestars');
+  const cx=cv.getContext('2d');
+  let stars=[];
+  function resize(){cv.width=window.innerWidth;cv.height=window.innerHeight;stars=[];for(let i=0;i<200;i++)stars.push({x:Math.random()*cv.width,y:Math.random()*cv.height,r:Math.random()*1.2+.3,a:Math.random(),da:.002+Math.random()*.003});}
+  window.addEventListener('resize',resize);resize();
+  (function loop(){cx.clearRect(0,0,cv.width,cv.height);stars.forEach(s=>{s.a+=s.da;if(s.a>1||s.a<0)s.da*=-1;cx.globalAlpha=s.a*.6;cx.fillStyle='#e8e4d9';cx.beginPath();cx.arc(s.x,s.y,s.r,0,6.28);cx.fill();});cx.globalAlpha=1;requestAnimationFrame(loop);})();
+})();
+</script>
+</body>
+</html>

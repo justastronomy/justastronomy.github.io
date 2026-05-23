@@ -101,76 +101,6 @@
       letter-spacing: 0.04em; margin-bottom: 48px;
     }
     .bas-credit a { color: var(--accent2, #6aabf7); }
-    /* ── Intro section (before the quiz) ── */
-    .intro-section {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 72px 24px 64px;
-    }
-
-    .intro-eyebrow {
-      font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
-      color: var(--accent); font-weight: 500; margin-bottom: 16px;
-    }
-
-    .intro-section h1 {
-      font-family: var(--font-display);
-      font-size: clamp(36px, 6vw, 60px);
-      font-weight: 600; line-height: 1.08; margin-bottom: 28px;
-    }
-
-    .intro-body {
-      font-size: 17px; color: var(--text-muted);
-      max-width: 600px; line-height: 1.85;
-      margin-bottom: 16px;
-    }
-
-    .intro-body em { color: var(--text); font-style: italic; }
-
-    .intro-credit {
-      font-size: 12px; color: var(--text-muted);
-      letter-spacing: 0.04em; margin-bottom: 40px;
-    }
-
-    .btn-scroll {
-      display: inline-flex; align-items: center; gap: 10px;
-      padding: 15px 32px;
-      background: var(--accent);
-      color: #080c16;
-      border-radius: 8px;
-      font-family: var(--font-body);
-      font-size: 15px; font-weight: 500;
-      letter-spacing: 0.03em;
-      cursor: pointer; border: none;
-      transition: opacity 0.2s, transform 0.2s;
-      text-decoration: none;
-    }
-    .btn-scroll:hover {
-      opacity: 0.85; transform: translateY(-1px); text-decoration: none;
-    }
-    .btn-scroll svg {
-      transition: transform 0.2s;
-    }
-    .btn-scroll:hover svg { transform: translateY(2px); }
-
-    /* Divider between intro and quiz */
-    .quiz-divider {
-      max-width: 900px; margin: 0 auto 48px;
-      padding: 0 24px;
-      display: flex; align-items: center; gap: 16px;
-    }
-    .quiz-divider::before,
-    .quiz-divider::after {
-      content: ''; flex: 1;
-      height: 1px; background: var(--border);
-    }
-    .quiz-divider span {
-      font-size: 11px; letter-spacing: 0.18em;
-      text-transform: uppercase; color: var(--text-muted);
-      white-space: nowrap;
-    }
-
-
 
     /* =====================
        QUIZ WRAPPER
@@ -495,44 +425,25 @@
       <a href="index.html" class="nav-logo">Just<span>Astronomy</span></a>
       <ul class="nav-links">
         <li><a href="log.html">Log</a></li>
-        <li><a href="dso.html">Deep Sky</a></li>
-        <li><a href="meteors.html">Meteors</a></li>
         <li><a href="equipment.html">Equipment</a></li>
         <li><a href="beginners.html" class="active">New Here?</a></li>
+        <li><a href="darksky.html">Dark Sky India</a></li>
+        <li><a href="events.html">Events</a></li>
         <li><a href="about.html">About</a></li>
       </ul>
     </div>
   </nav>
 
   <!-- PAGE HEADER -->
-  <div class="intro-section">
-    <p class="intro-eyebrow">Getting started</p>
+  <div class="page-header">
+    <p class="page-eyebrow">Getting started</p>
     <h1>New to Astronomy?</h1>
-    <p class="intro-body">
-      So you're interested in astronomy — welcome. One of the first questions everyone
-      asks is: <em>what equipment should I buy?</em> And it's genuinely a hard one.
-      There's a plethora of options across every budget, and the advice online can be
-      overwhelming and contradictory.
-    </p>
-    <p class="intro-body">
-      Let's cut through that. Answer a few quick questions and I'll point you to
-      something that actually suits your sky, your lifestyle, and your budget.
-    </p>
-    <p class="intro-credit">From one amateur to another — no affiliates, no sales pitch, no spin.</p>
-
-    <button class="btn-scroll" onclick="document.getElementById('quiz-start').scrollIntoView({behavior:'smooth'})">
-      Find your first scope
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <path d="M8 3v10M3 9l5 5 5-5" stroke="currentColor" stroke-width="1.8"
-              stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </button>
+    <p>Answer a few questions and get an honest, personalised recommendation for your first telescope or binoculars — matched to your sky, budget and lifestyle.</p>
+    <p class="bas-credit">From one amateur to another — no affiliates, no sales pitch, no spin.</p>
   </div>
 
-  <div class="quiz-divider"><span>Equipment finder</span></div>
-
   <!-- QUIZ WRAPPER -->
-  <div class="quiz-wrapper" id="quiz-start">
+  <div class="quiz-wrapper">
     <canvas id="stars"></canvas>
 
     <div class="quiz-container">
