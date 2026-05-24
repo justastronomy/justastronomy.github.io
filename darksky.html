@@ -28,21 +28,12 @@ body{background:var(--bg);color:var(--text);font-family:'IBM Plex Mono',monospac
 h1,h2,h3,h4{font-family:'Cormorant Garamond',serif;font-weight:600;}
 
 /* ── HEADER ─────────────────────────────────── */
-header{
-  position:sticky;top:0;z-index:2000;
-  background:rgba(6,7,13,0.92);backdrop-filter:blur(14px);
-  border-bottom:1px solid var(--border);
-  padding:0 52px;height:62px;
-  display:flex;align-items:center;justify-content:space-between;
-}
 .logo{display:flex;align-items:center;gap:13px;}
 .logo-star{font-size:22px;color:var(--gold);animation:twinkle 3.5s ease-in-out infinite;}
 @keyframes twinkle{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.45;transform:scale(.85);}}
 .logo-text{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:700;color:var(--gold);letter-spacing:.06em;}
 .logo-sub{font-size:9.5px;color:var(--text-dim);letter-spacing:.14em;text-transform:uppercase;margin-top:1px;}
-nav{display:flex;gap:30px;}
-nav a{color:var(--text-dim);text-decoration:none;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;transition:color .2s;}
-nav a:hover{color:var(--gold);}
+/* dark sky internal nav removed — site nav handles navigation */
 
 /* ── LAYOUT HELPERS ──────────────────────────── */
 .container{max-width:1260px;margin:0 auto;padding:0 52px;}
@@ -91,7 +82,7 @@ nav a:hover{color:var(--gold);}
 }
 
 /* ── FINDER SECTION ──────────────────────────── */
-#finder{padding:60px 0 80px;border-top:1px solid var(--border);}
+#finder{padding:60px 0 80px;border-top:1px solid var(--border);position:relative;z-index:1;}
 .finder-head{text-align:center;margin-bottom:38px;}
 .finder-head h2{font-size:36px;margin-bottom:7px;}
 .finder-head p{font-size:11.5px;color:var(--text-dim);letter-spacing:.04em;}
@@ -236,10 +227,14 @@ footer{border-top:1px solid var(--border);padding:28px 52px;display:flex;justify
 .step-body{font-size:10.5px;color:var(--text-dim);line-height:1.75;}
 .step-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle;}
 
+
+  .site-footer-inner{flex-direction:column;text-align:center;}
+  .site-footer-wrap{padding:24px;}
+}
 /* ── JustAstronomy site nav ─────────────────────────── */
-canvas#sitestars{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+
 .site-nav{
-  position:sticky;top:0;z-index:2000;
+  position:sticky;top:0;z-index:5000;
   background:rgba(8,12,22,0.93);backdrop-filter:blur(14px);
   border-bottom:1px solid rgba(255,255,255,0.07);
 }
@@ -280,13 +275,9 @@ canvas#sitestars{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;po
 .footer-copy{font-size:9.5px;color:rgba(229,221,200,0.45);letter-spacing:.05em;}
 @media(max-width:640px){
   .site-nav .nav-links{display:none;}
-  .site-footer-inner{flex-direction:column;text-align:center;}
-  .site-footer-wrap{padding:24px;}
-}
 </style>
 </head>
 <body>
-<canvas id="sitestars"></canvas>
   <nav class="site-nav">
     <div class="nav-inner">
       <a href="index.html" class="nav-logo">Just<span>Astronomy</span></a>
@@ -1004,7 +995,7 @@ function initSearch(){
 
 /* ─── NAV ────────────────────────────────────── */
 function initNav(){
-  document.querySelectorAll('nav a').forEach(a=>{
+  document.querySelectorAll('.dsi-internal-nav a').forEach(a=>{
     a.addEventListener('click',e=>{
       e.preventDefault();
       document.getElementById(a.getAttribute('href').slice(1))?.scrollIntoView({behavior:'smooth'});
@@ -1023,16 +1014,5 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 </script>
 
-<script>
-// Site background star canvas (id="sitestars")
-(function(){
-  const cv=document.getElementById('sitestars');
-  const cx=cv.getContext('2d');
-  let stars=[];
-  function resize(){cv.width=window.innerWidth;cv.height=window.innerHeight;stars=[];for(let i=0;i<200;i++)stars.push({x:Math.random()*cv.width,y:Math.random()*cv.height,r:Math.random()*1.2+.3,a:Math.random(),da:.002+Math.random()*.003});}
-  window.addEventListener('resize',resize);resize();
-  (function loop(){cx.clearRect(0,0,cv.width,cv.height);stars.forEach(s=>{s.a+=s.da;if(s.a>1||s.a<0)s.da*=-1;cx.globalAlpha=s.a*.6;cx.fillStyle='#e8e4d9';cx.beginPath();cx.arc(s.x,s.y,s.r,0,6.28);cx.fill();});cx.globalAlpha=1;requestAnimationFrame(loop);})();
-})();
-</script>
 </body>
 </html>
