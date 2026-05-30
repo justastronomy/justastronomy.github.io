@@ -6,7 +6,7 @@
 <title>Dark Sky India — JustAstronomy</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Sans:wght@300;400;500&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <style>
@@ -24,42 +24,25 @@
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
-body{background:var(--bg);color:var(--text);font-family:'IBM Plex Mono',monospace;font-weight:300;overflow-x:hidden;
-  /* CSS star field — safe alternative to canvas on pages with overflow-x:hidden */}
-body::before {
-  content: '';
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  pointer-events: none;
-  z-index: 0;
-  background-image:
-    radial-gradient(1px 1px at 12% 18%, rgba(255,255,255,0.65) 0%, transparent 100%),
-    radial-gradient(1px 1px at 68%  9%, rgba(255,255,255,0.5)  0%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 85% 32%, rgba(255,255,255,0.4) 0%, transparent 100%),
-    radial-gradient(1px 1px at 41% 14%, rgba(255,255,255,0.7)  0%, transparent 100%),
-    radial-gradient(1px 1px at  4% 58%, rgba(255,255,255,0.4)  0%, transparent 100%),
-    radial-gradient(1px 1px at 91% 70%, rgba(255,255,255,0.5)  0%, transparent 100%),
-    radial-gradient(1px 1px at 25% 82%, rgba(255,255,255,0.35) 0%, transparent 100%),
-    radial-gradient(1px 1px at 53% 91%, rgba(255,255,255,0.4)  0%, transparent 100%),
-    radial-gradient(1px 1px at 76% 53%, rgba(255,255,255,0.55) 0%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 35% 42%, rgba(255,255,255,0.3) 0%, transparent 100%),
-    radial-gradient(1px 1px at 60% 36%, rgba(255,255,255,0.5)  0%, transparent 100%),
-    radial-gradient(1px 1px at 17% 94%, rgba(255,255,255,0.4)  0%, transparent 100%);
-}
-
-#intro { position: relative; z-index: 1; }
-#finder { position: relative; z-index: 1; }
-.site-footer-wrap { position: relative; z-index: 1; }
-
+body{background:var(--bg);color:var(--text);font-family:'IBM Plex Mono',monospace;font-weight:300;overflow-x:hidden;}
 h1,h2,h3,h4{font-family:'Cormorant Garamond',serif;font-weight:600;}
 
 /* ── HEADER ─────────────────────────────────── */
+header{
+  position:sticky;top:0;z-index:2000;
+  background:rgba(6,7,13,0.92);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+  padding:0 52px;height:62px;
+  display:flex;align-items:center;justify-content:space-between;
+}
 .logo{display:flex;align-items:center;gap:13px;}
 .logo-star{font-size:22px;color:var(--gold);animation:twinkle 3.5s ease-in-out infinite;}
 @keyframes twinkle{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.45;transform:scale(.85);}}
 .logo-text{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:700;color:var(--gold);letter-spacing:.06em;}
 .logo-sub{font-size:9.5px;color:var(--text-dim);letter-spacing:.14em;text-transform:uppercase;margin-top:1px;}
-/* dark sky internal nav removed — site nav handles navigation */
+nav{display:flex;gap:30px;}
+nav a{color:var(--text-dim);text-decoration:none;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;transition:color .2s;}
+nav a:hover{color:var(--gold);}
 
 /* ── LAYOUT HELPERS ──────────────────────────── */
 .container{max-width:1260px;margin:0 auto;padding:0 52px;}
@@ -108,7 +91,7 @@ h1,h2,h3,h4{font-family:'Cormorant Garamond',serif;font-weight:600;}
 }
 
 /* ── FINDER SECTION ──────────────────────────── */
-#finder{padding:60px 0 80px;border-top:1px solid var(--border);position:relative;z-index:1;}
+#finder{padding:60px 0 80px;border-top:1px solid var(--border);}
 .finder-head{text-align:center;margin-bottom:38px;}
 .finder-head h2{font-size:36px;margin-bottom:7px;}
 .finder-head p{font-size:11.5px;color:var(--text-dim);letter-spacing:.04em;}
@@ -253,20 +236,17 @@ footer{border-top:1px solid var(--border);padding:28px 52px;display:flex;justify
 .step-body{font-size:10.5px;color:var(--text-dim);line-height:1.75;}
 .step-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle;}
 
-
-  .site-footer-inner{flex-direction:column;text-align:center;}
-  .site-footer-wrap{padding:24px;}
-}
 /* ── JustAstronomy site nav ─────────────────────────── */
-
+canvas#sitestars{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
 .site-nav{
-  position:sticky;top:0;z-index:5000;
+  position: relative;
+  position:sticky;top:0;z-index:2000;
   background:rgba(8,12,22,0.93);backdrop-filter:blur(14px);
   border-bottom:1px solid rgba(255,255,255,0.07);
 }
 .site-nav .nav-inner{
   display:flex;align-items:center;justify-content:space-between;
-  padding:18px 24px;max-width:900px;margin:0 auto;
+  padding:16px 24px;max-width:100%;
 }
 .site-nav .nav-logo{
   font-family:'Cormorant Garamond',Georgia,serif;
@@ -275,10 +255,10 @@ footer{border-top:1px solid var(--border);padding:28px 52px;display:flex;justify
 .site-nav .nav-logo span{color:#c9933a;}
 .site-nav .nav-links{display:flex;gap:24px;list-style:none;}
 .site-nav .nav-links a{
-  color:#8a93a8;font-size:13px;font-weight:500;
+  color:#8a93a8;font-size:12px;font-weight:500;
   letter-spacing:.06em;text-transform:uppercase;
   text-decoration:none;transition:color .2s;
-  font-family:'DM Sans',sans-serif;
+  font-family:'IBM Plex Mono',monospace;
 }
 .site-nav .nav-links a:hover,
 .site-nav .nav-links a.active{color:#c9933a;}
@@ -299,15 +279,61 @@ footer{border-top:1px solid var(--border);padding:28px 52px;display:flex;justify
 }
 .footer-brand .acc{color:#c9933a;}
 .footer-copy{font-size:9.5px;color:rgba(229,221,200,0.45);letter-spacing:.05em;}
+
+  .site-footer-wrap{padding:24px;}
+}
+
+/* Hamburger button */
+.nav-toggle {
+  display: none;
+  background: none;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 6px;
+  color: #e8e4d9;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 6px 10px;
+  line-height: 1;
+  transition: border-color 0.2s, color 0.2s;
+}
+.nav-toggle:hover { border-color: #c9933a; color: #c9933a; }
+
 @media(max-width:640px){
-  .site-nav .nav-links{display:none;}
+  .site-nav .nav-links { display: none; }
+  .nav-toggle { display: block; }
+  .site-nav .nav-links.open {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: absolute;
+    top: 100%; left: 0; right: 0;
+    background: rgba(8,12,22,0.98);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    padding: 6px 0 10px;
+    z-index: 200;
+  }
+  .site-nav .nav-links.open li a {
+    display: block;
+    padding: 13px 24px;
+    font-size: 14px;
+    letter-spacing: .06em;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    font-family: 'DM Sans', sans-serif;
+  }
+  .site-nav .nav-links.open li:last-child a { border-bottom: none; }
+  .site-footer-inner { flex-direction: column; text-align: center; }
+  .site-footer-wrap { padding: 24px; }
+}
 </style>
 </head>
 <body>
+<canvas id="sitestars"></canvas>
   <nav class="site-nav">
     <div class="nav-inner">
       <a href="index.html" class="nav-logo">Just<span>Astronomy</span></a>
-      <ul class="nav-links">
+      <button class="nav-toggle" id="nav-toggle" aria-label="Open navigation menu">&#9776;</button>
+      <ul class="nav-links" id="nav-links">
         <li><a href="log.html">Log</a></li>
         <li><a href="equipment.html">Equipment</a></li>
         <li><a href="beginners.html">New Here?</a></li>
@@ -1021,7 +1047,7 @@ function initSearch(){
 
 /* ─── NAV ────────────────────────────────────── */
 function initNav(){
-  document.querySelectorAll('.dsi-internal-nav a').forEach(a=>{
+  document.querySelectorAll('nav a').forEach(a=>{
     a.addEventListener('click',e=>{
       e.preventDefault();
       document.getElementById(a.getAttribute('href').slice(1))?.scrollIntoView({behavior:'smooth'});
@@ -1040,5 +1066,36 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 </script>
 
+<script>
+// Site background star canvas (id="sitestars")
+(function(){
+  const cv=document.getElementById('sitestars');
+  const cx=cv.getContext('2d');
+  let stars=[];
+  function resize(){cv.width=window.innerWidth;cv.height=window.innerHeight;stars=[];for(let i=0;i<200;i++)stars.push({x:Math.random()*cv.width,y:Math.random()*cv.height,r:Math.random()*1.2+.3,a:Math.random(),da:.002+Math.random()*.003});}
+  window.addEventListener('resize',resize);resize();
+  (function loop(){cx.clearRect(0,0,cv.width,cv.height);stars.forEach(s=>{s.a+=s.da;if(s.a>1||s.a<0)s.da*=-1;cx.globalAlpha=s.a*.6;cx.fillStyle='#e8e4d9';cx.beginPath();cx.arc(s.x,s.y,s.r,0,6.28);cx.fill();});cx.globalAlpha=1;requestAnimationFrame(loop);})();
+})();
+</script>
+
+<script>
+(function () {
+  var btn   = document.getElementById('nav-toggle');
+  var links = document.getElementById('nav-links');
+  if (!btn || !links) return;
+  btn.addEventListener('click', function () {
+    var open = links.classList.toggle('open');
+    btn.setAttribute('aria-expanded', open);
+    btn.innerHTML = open ? '&#10005;' : '&#9776;';
+  });
+  links.querySelectorAll('a').forEach(function (a) {
+    a.addEventListener('click', function () {
+      links.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+      btn.innerHTML = '&#9776;';
+    });
+  });
+})();
+</script>
 </body>
 </html>
