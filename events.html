@@ -22,7 +22,10 @@
     a{color:var(--accent);text-decoration:none;}
     a:hover{text-decoration:underline;}
     #stars{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
-    nav{position:sticky;top:0;z-index:100;background:rgba(8,12,22,0.92);
+    nav{position: relative;
+      position:sticky
+      position: relative;
+      position: sticky;top:0;z-index:100;background:rgba(8,12,22,0.92);
          backdrop-filter:blur(12px);border-bottom:1px solid var(--border);}
     .nav-inner{display:flex;align-items:center;justify-content:space-between;
                 padding:18px 24px;max-width:900px;margin:0 auto;}
@@ -55,8 +58,45 @@
     .footer-brand{font-family:var(--font-display);font-size:18px;color:var(--text-muted);}
     .footer-brand span{color:var(--accent);}
     .footer-right{font-size:13px;color:var(--text-muted);}
+    /* Hamburger button — hidden on desktop, shown on mobile */
+    .nav-toggle {
+      display: none;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 18px;
+      cursor: pointer;
+      padding: 6px 10px;
+      line-height: 1;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .nav-toggle:hover { border-color: var(--accent); color: var(--accent); }
+
     @media(max-width:640px){
-      .nav-links{display:none;}
+      .nav-toggle { display: block; }
+      .nav-links  { display: none; }
+      .nav-links.open {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        position: absolute;
+        top: 100%; left: 0; right: 0;
+        background: rgba(8, 12, 22, 0.98);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border-bottom: 1px solid var(--border);
+        padding: 6px 0 10px;
+        z-index: 200;
+      }
+      .nav-links.open li a {
+        display: block;
+        padding: 13px 24px;
+        font-size: 14px;
+        letter-spacing: 0.06em;
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-links.open li:last-child a { border-bottom: none; }
       .footer-inner{flex-direction:column;gap:12px;text-align:center;}
       .construction-card{padding:40px 24px;}
     }
@@ -67,7 +107,7 @@
   <nav>
     <div class="nav-inner">
       <a href="index.html" class="nav-logo">Just<span>Astronomy</span></a>
-      <ul class="nav-links">
+      <ul class="nav-links" id="nav-links">
         <li><a href="log.html">Log</a></li>
         <li><a href="equipment.html">Equipment</a></li>
         <li><a href="beginners.html">New Here?</a></li>
@@ -186,6 +226,27 @@
   resize(); seed(); draw();
   window.addEventListener('resize', () => { resize(); seed(); });
 })()
+  </script>
+
+  <script>
+  /* Mobile nav hamburger toggle */
+  (function () {
+    var btn   = document.getElementById('nav-toggle');
+    var links = document.getElementById('nav-links');
+    if (!btn || !links) return;
+    btn.addEventListener('click', function () {
+      var open = links.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open);
+      btn.innerHTML = open ? '&#10005;' : '&#9776;';
+    });
+    links.querySelectorAll('a').forEach(function (a) {
+      a.addEventListener('click', function () {
+        links.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+        btn.innerHTML = '&#9776;';
+      });
+    });
+  })();
   </script>
 </body>
 </html>
