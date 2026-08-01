@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Birds — JustAstronomy</title>
-  <meta name="description" content="A personal photo diary of birds — 50 sightings, their calls, and why each one stuck.">
+  <meta name="description" content="A personal photo diary of birds — 50 sightings from over the years.">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -150,10 +150,10 @@
       text-transform: uppercase;
     }
 
-    /* MODAL */
+    /* MODAL — simple photo lightbox */
     .modal-overlay {
       position: fixed; inset: 0; z-index: 1000;
-      background: rgba(4, 6, 12, 0.88);
+      background: rgba(4, 6, 12, 0.92);
       backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
       display: none; align-items: center; justify-content: center;
       padding: 24px;
@@ -161,51 +161,39 @@
     .modal-overlay.open { display: flex; }
 
     .modal-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      max-width: 920px;
+      position: relative;
+      max-width: 1100px;
+      max-height: 90vh;
       width: 100%;
-      max-height: 88vh;
-      overflow-y: auto;
-      display: grid;
-      grid-template-columns: 1.1fr 1fr;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-    .modal-photo { background: #000; }
-    .modal-photo img { width: 100%; height: 100%; object-fit: cover; }
-
-    .modal-body { padding: 36px 36px 32px; display: flex; flex-direction: column; }
-    .modal-sci { font-style: italic; color: var(--text-muted); font-size: 13px; margin-bottom: 8px; }
-    .modal-title {
-      font-family: var(--font-display); font-size: 32px; font-weight: 600;
-      line-height: 1.15; margin-bottom: 18px;
-    }
-
-    .call-player {
-      background: var(--surface-2);
-      border: 1px solid var(--border);
+    .modal-photo {
+      max-width: 100%;
+      max-height: 78vh;
       border-radius: 10px;
-      padding: 14px 16px;
-      margin-bottom: 22px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: #000;
+      display: flex;
     }
-    .call-player-label {
-      font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--accent); margin-bottom: 10px; font-weight: 500;
-    }
-    .call-player audio { width: 100%; height: 34px; }
-    .call-credit { font-size: 11.5px; color: var(--text-muted); margin-top: 8px; line-height: 1.5; }
-    .call-credit a { color: var(--text-muted); text-decoration: underline; }
-    .call-missing {
-      font-size: 13px; color: var(--text-muted); font-style: italic;
-    }
+    .modal-photo img { max-width: 100%; max-height: 78vh; object-fit: contain; display: block; }
 
-    .modal-writeup { color: var(--text-muted); font-size: 15px; line-height: 1.8; }
-    .photo-credit { margin-top: auto; padding-top: 22px; font-size: 11.5px; color: var(--text-muted); }
+    .modal-caption {
+      margin-top: 16px;
+      text-align: center;
+    }
+    .modal-title {
+      font-family: var(--font-display); font-size: 24px; font-weight: 600;
+      line-height: 1.2;
+    }
+    .modal-sci { font-style: italic; color: var(--text-muted); font-size: 13px; margin-top: 4px; }
 
     .modal-close {
-      position: absolute; top: 14px; right: 14px;
+      position: absolute; top: -18px; right: -18px;
       width: 36px; height: 36px; border-radius: 50%;
-      background: rgba(8,12,22,0.7); border: 1px solid var(--border);
+      background: var(--surface); border: 1px solid var(--border);
       color: var(--text); font-size: 18px; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       z-index: 5;
@@ -225,13 +213,11 @@
     /* RESPONSIVE */
     @media (max-width: 900px) {
       .bird-grid { grid-template-columns: repeat(6, 1fr); }
-      .modal-card { grid-template-columns: 1fr; max-height: 92vh; }
-      .modal-photo { aspect-ratio: 4/3; }
     }
     @media (max-width: 560px) {
       .bird-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-      .modal-body { padding: 26px 22px 24px; }
-      .modal-title { font-size: 26px; }
+      .modal-title { font-size: 20px; }
+      .modal-close { top: 8px; right: 8px; }
     }
     @media (max-width: 640px) {
       .nav-toggle { display: block; }
@@ -280,10 +266,9 @@
     <p class="hero-eyebrow">A Photo Diary · South India</p>
     <h1>Fifty birds,<br>fifty <em>mornings</em></h1>
     <p class="hero-desc">
-      A personal collection of birds spotted over the years — click any photo to see it larger,
-      hear its call, and read why that particular sighting stuck with me.
+      A personal collection of birds spotted over the years — click any photo to see it full size.
     </p>
-    <p class="hero-progress"><strong id="bird-count">5</strong> of 50 birds added so far</p>
+    <p class="hero-progress"><strong id="bird-count">0</strong> of 50 birds added so far</p>
   </header>
 
   <section>
@@ -297,17 +282,9 @@
     <div class="modal-card" id="modal-card" role="dialog" aria-modal="true">
       <button class="modal-close" id="modal-close" aria-label="Close">&#10005;</button>
       <div class="modal-photo"><img id="modal-img" src="" alt=""></div>
-      <div class="modal-body">
+      <div class="modal-caption">
+        <p class="modal-title" id="modal-title"></p>
         <p class="modal-sci" id="modal-sci"></p>
-        <h2 class="modal-title" id="modal-title"></h2>
-
-        <div class="call-player">
-          <p class="call-player-label">Call / Song</p>
-          <div id="call-player-inner"></div>
-        </div>
-
-        <p class="modal-writeup" id="modal-writeup"></p>
-        <p class="photo-credit" id="modal-photo-credit"></p>
       </div>
     </div>
   </div>
@@ -322,127 +299,12 @@
   <script>
   /* =====================================================================
      BIRD DATA
-     One object per bird. Add more entries here as photos come in — the
-     grid and modal are both generated from this array, nothing else
-     needs to change.
-
-     audio: { src: <direct mp3/ogg URL or xeno-canto embed URL>, recordist,
-              license, sourceUrl } — leave audio as null until a call
-     recording has been picked out for that bird.
+     One object per bird: slug (matches image filenames), common name,
+     scientific name. Add more entries here as photos come in — the grid
+     and modal are both generated from this array, nothing else needs
+     to change.
   ===================================================================== */
   const BIRDS = [
-    {
-      slug: "chestnut_tailed_starling",
-      commonName: "Chestnut-tailed Starling",
-      sciName: "Sturnia malabarica",
-      writeup: "A resident of North East India that spends its winters in the deciduous forests of South India. Yellow bill with a deep blue base, and a grey head — the male of the species is brightly coloured. Its cousin, the Rosy Starling, is well known for its murmurations in flocks exceeding a few thousand individuals. Spotted this one in the forests of Nagarahole on a bright, sunny morning in January 2026.",
-      audio: null
-    },
-    {
-      slug: "ashy_prinia",
-      commonName: "Ashy Prinia",
-      sciName: "Prinia socialis",
-      writeup: "This small bird is everywhere — go to any wooded area and you're sure to see her. Some individuals have a white supercilium (fancy word for eyebrow). A tinge of orange to light yellow on the underparts, and dark upperparts, distinguish it from the plain prinia.",
-      audio: null
-    },
-    {
-      slug: "common_iora",
-      commonName: "Common Iora",
-      sciName: "Aegithina tiphia",
-      writeup: "Uniform yellow to yellow-green underparts, with a black tail — this female was seen perching just outside my window at home. This is probably what 'cuteness' looks like.",
-      audio: null
-    },
-    {
-      slug: "white_cheeked_barbet",
-      commonName: "White-cheeked Barbet",
-      sciName: "Psilopogon viridis",
-      writeup: "Endemic to the Western Ghats of South India and south interior Karnataka, this bird's stocky bill can dig through the thick bark of hardwood trees in search of small critters. Notice the white patch in the cheek area, under the eye — hence the name. A whitish, streaked breast with a green lower body. This particular individual loved the berries on a tree in front of my home — a regular visitor, and a very co-operative subject for photography.",
-      audio: null
-    },
-    {
-      slug: "baya_weaver",
-      commonName: "Baya Weaver",
-      sciName: "Ploceus philippinus",
-      writeup: "The all-famous weaver bird. During breeding season, these birds are constantly flitting around — building the nest, cleaning it, or feeding their chicks. The nest itself is said to be designed with a fore-chamber and an ante-chamber. The ante-chamber, sealed by a small flap, is where the young reside. The fore-chamber is left empty — just in case a snake visits. Nature's own decoy mechanism.",
-      audio: null
-    },
-    {
-      slug: "purple_rumped_sunbird",
-      commonName: "Purple-rumped Sunbird",
-      sciName: "Leptocoma zeylonica",
-      writeup: "Sunbirds are highly active, especially during early to late mornings. You'll see them on flowering trees, trying to drink nectar from flowers — look at the shape of the beak, it's evolved specifically to extract nectar. This particular species has a resplendent purple colour that shines when sunlight falls on it. This bird went to the paint store and ordered every colour on the shelf, it appears.",
-      audio: null
-    },
-    {
-      slug: "common_kingfisher",
-      commonName: "Common Kingfisher",
-      sciName: "Alcedo atthis",
-      writeup: "Just a shade bigger than the Oriental Dwarf Kingfisher, at about 16 to 18 cm long, this guy is an expert at catching fish. Sitting at a vantage perch, it closely monitors fish in slow-flowing streams, rivers and lakes. The moment it spots its target, it takes off, wings swept back — dive-bombs into the water, its dagger-like beak pierces the surface, grabs its prey, and is off, all in a matter of seconds. Generally returns to the same perch, again and again. If mother nature wanted to show off her colouring capabilities, here is one of her finest examples.",
-      audio: null
-    },
-    {
-      slug: "indian_golden_oriole",
-      commonName: "Indian Golden Oriole",
-      sciName: "Oriolus kundoo",
-      writeup: "A winter visitor to South India, this bird bobs up and down as it flies. A yellow body with black wings, patched with yellow — you cannot miss spotting this bird. A closer look reveals a black patch around its eyes, like a mask. Lets out a high-pitched cry, especially when another bird comes too close to its turf.",
-      audio: null
-    },
-    {
-      slug: "grey_breasted_prinia",
-      commonName: "Grey-breasted Prinia",
-      sciName: "Prinia hodgsonii",
-      writeup: "A smallish bird, present in most parts of India, that prefers to perch on treetops along forest edges. Travels in flocks. Lower-part colouration ranges from off-white with a dark breast patch (breeding plumage) to dull grey.",
-      audio: null
-    },
-    {
-      slug: "indian_grey_hornbill",
-      commonName: "Indian Grey Hornbill",
-      sciName: "Ocyceros birostris",
-      writeup: "Commonly seen on large fruiting trees, this hornbill is distinguished from its Malabar cousin by the presence of a bump — a casque — on its bill. Another noticeable feature is a long tail, which helps with its typical flight pattern: a few rapid wingbeats followed by a smooth glide. When spread out, the wings reveal a whitish tip. Spotted this bird during a tiger safari.",
-      audio: null
-    },
-    {
-      slug: "great_white_pelican",
-      commonName: "Great White Pelican",
-      sciName: "Pelecanus onocrotalus",
-      writeup: "A large, heavy bird with a pronounced pouch, its wingspan can reach about 12 feet. Seen in flocks of a few thousand during breeding season in South India. Its typical feeding behaviour involves scooping up large amounts of water — and along with it, fish — then tilting its beak to drain out the water and swallowing the fish whole. Whenever I see this bird, I'm reminded of an A380 coming in to land. Much quieter, though.",
-      audio: null
-    },
-    {
-      slug: "purple_sunbird",
-      commonName: "Purple Sunbird",
-      sciName: "Cinnyris asiaticus",
-      writeup: "Unlike the Purple-rumped Sunbird, this bird lacks the multitude of body colours. Characterized by a curved beak well suited to extracting nectar from flowers, the male is a bright metallic purple that glistens in the sun. The female, on the other hand, has dull, dark grey upperparts and off-white to dull grey lower parts. A fairly common visitor, even in urban forests and flower gardens.",
-      audio: null
-    },
-    {
-      slug: "tickells_blue_flycatcher",
-      commonName: "Tickell's Blue Flycatcher",
-      sciName: "Cyornis tickelliae",
-      writeup: "A short, sharp bill, bright blue upperparts, and white to light orange/yellow underparts. The female has a slightly duller shade overall. Likes hillsides and scrubby bush. The deep black eyes, set in blue all around, make this bird even prettier. Catches insects mid-air and returns to its perch. Occasionally feeds on termites and larvae on leaves.",
-      audio: null
-    },
-    {
-      slug: "verditer_flycatcher",
-      commonName: "Verditer Flycatcher",
-      sciName: "Eumyias thalassinus",
-      writeup: "A uniform turquoise-blue flycatcher seen in hilly forests and along forest fringes. Generally solitary. Its birdsong consists of a repetitive, undulating three or four notes.",
-      audio: null
-    },
-    {
-      slug: "asian_fairy_bluebird",
-      commonName: "Asian Fairy-bluebird",
-      sciName: "Irena puella",
-      writeup: "Just like many other avian species, the male is bright, royal blue with a spattering of jet black; the female is slightly duller in colour. Loves to feed on berries and small fruits, and so is seen in urban forests and occasionally sub-urban homes, in search of them. Notice the blood-red eyes.",
-      audio: null
-    },
-    {
-      slug: "black_rumped_flameback",
-      commonName: "Black-rumped Flameback",
-      sciName: "Dinopium benghalense",
-      writeup: "From the woodpecker family, this bird has a golden-coloured back with a dark lower back and a bright red head. Endemic to India and Sri Lanka, it's generally seen wherever hardwood trees are present, looking for insects in the crevices of the bark and underneath it.",
-      audio: null
-    }
   ];
 
   const TOTAL_PLANNED = 50;
@@ -477,33 +339,17 @@
   }
 
   /* ===================== MODAL ===================== */
-  const overlay   = document.getElementById('modal-overlay');
-  const imgEl     = document.getElementById('modal-img');
-  const sciEl     = document.getElementById('modal-sci');
-  const titleEl   = document.getElementById('modal-title');
-  const writeupEl = document.getElementById('modal-writeup');
-  const creditEl  = document.getElementById('modal-photo-credit');
-  const playerEl  = document.getElementById('call-player-inner');
+  const overlay = document.getElementById('modal-overlay');
+  const imgEl   = document.getElementById('modal-img');
+  const sciEl   = document.getElementById('modal-sci');
+  const titleEl = document.getElementById('modal-title');
 
   function openModal(i) {
     const b = BIRDS[i];
     imgEl.src = `assets/birds/full/${b.slug}.jpg`;
     imgEl.alt = b.commonName;
-    sciEl.textContent = b.sciName;
+    sciEl.textContent = b.sciName || '';
     titleEl.textContent = b.commonName;
-    writeupEl.textContent = b.writeup;
-    creditEl.textContent = 'Photo © Nandan Narasimha';
-
-    if (b.audio && b.audio.src) {
-      playerEl.innerHTML = `
-        <audio controls preload="none" src="${b.audio.src}"></audio>
-        <p class="call-credit">Recording by ${b.audio.recordist || 'unknown recordist'}
-          (${b.audio.license || 'license unknown'}) via
-          <a href="${b.audio.sourceUrl}" target="_blank" rel="noopener">Xeno-canto</a></p>
-      `;
-    } else {
-      playerEl.innerHTML = `<p class="call-missing">Call recording coming soon.</p>`;
-    }
 
     overlay.classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -512,7 +358,6 @@
   function closeModal() {
     overlay.classList.remove('open');
     document.body.style.overflow = '';
-    playerEl.innerHTML = '';
   }
 
   document.getElementById('modal-close').addEventListener('click', closeModal);
