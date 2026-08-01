@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Birds — JustAstronomy</title>
-  <meta name="description" content="A personal photo diary of birds — 50 sightings from over the years.">
+  <title>A Birder's Photo Diary — JustAstronomy</title>
+  <meta name="description" content="A birder's photo diary — bird sightings from Central and South India, photographed over the years.">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -263,12 +263,11 @@
   </nav>
 
   <header class="hero">
-    <p class="hero-eyebrow">A Photo Diary · South India</p>
+    <p class="hero-eyebrow">A Birder's Photo Diary · Central &amp; South India</p>
     <h1>Fifty birds,<br>fifty <em>mornings</em></h1>
     <p class="hero-desc">
       A personal collection of birds spotted over the years — click any photo to see it full size.
     </p>
-    <p class="hero-progress"><strong id="bird-count">0</strong> of 50 birds added so far</p>
   </header>
 
   <section>
@@ -339,19 +338,28 @@
     { slug: "red_rumped_swallow",        commonName: "Red-rumped Swallow",        sciName: "Cecropis daurica" },
     { slug: "red_vented_bulbul",         commonName: "Red-vented Bulbul",         sciName: "Pycnonotus cafer" },
     { slug: "red_wattled_lapwing",       commonName: "Red-wattled Lapwing",       sciName: "Vanellus indicus" },
-    { slug: "small_Pratincole",          commonName: "small_Pratincole",          sciName: "Glareola lactea" },
+    { slug: "small_pratincole",          commonName: "Small Pratincole",          sciName: "Glareola lactea" },
     { slug: "rosy_starling",             commonName: "Rosy Starling",             sciName: "Pastor roseus" },
     { slug: "rufous_treepie",            commonName: "Rufous Treepie",            sciName: "Dendrocitta vagabunda" },
     { slug: "spotted_owlet",             commonName: "Spotted Owlet",             sciName: "Athene brama" },
     { slug: "tawny_bellied_babbler",     commonName: "Tawny-bellied Babbler",     sciName: "Dumetia hyperythra" },
-    { slug: "tickells_blue_flycatcher",  commonName: "Tickell's Blue Flycatcher", sciName: "Cyornis tickelliae" }
+    { slug: "tickells_blue_flycatcher",  commonName: "Tickell's Blue Flycatcher", sciName: "Cyornis tickelliae" },
+    { slug: "indian_roller",             commonName: "Indian Roller",             sciName: "Coracias benghalensis" },
+    { slug: "plain_prinia_2",            commonName: "Plain Prinia",              sciName: "Prinia inornata" },
+    { slug: "white_eyed_buzzard",        commonName: "White-eyed Buzzard",        sciName: "Butastur teesa" },
+    { slug: "white_cheeked_barbet",      commonName: "White-cheeked Barbet",      sciName: "Psilopogon viridis" },
+    { slug: "white_rumped_shama",        commonName: "White-rumped Shama",        sciName: "Copsychus malabaricus" },
+    { slug: "yellow_wagtail",            commonName: "Western Yellow Wagtail",    sciName: "Motacilla flava" },
+    { slug: "zitting_cisticola",         commonName: "Zitting Cisticola",         sciName: "Cisticola juncidis" },
+    { slug: "tricoloured_munia",         commonName: "Tricoloured Munia",         sciName: "Lonchura malacca" },
+    { slug: "lesser_adjutant",           commonName: "Lesser Adjutant",           sciName: "Leptoptilos javanicus" },
+    { slug: "indian_robin_female",       commonName: "Indian Robin (male)",       sciName: "Copsychus fulicatus" }
   ];
 
   const TOTAL_PLANNED = 50;
 
   /* ===================== RENDER GRID ===================== */
   const grid = document.getElementById('bird-grid');
-  document.getElementById('bird-count').textContent = BIRDS.length;
 
   BIRDS.forEach((bird, i) => {
     const tile = document.createElement('div');
